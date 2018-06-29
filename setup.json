@@ -1,0 +1,40 @@
+{
+    "name": "aiida-ddec",
+    "author": "Aliaksandr Yakutovich",
+    "author_email": "aliaksandr.yakutovich@epfl.ch",
+    "description": "AiiDA plugin DDEC code",
+    "url": "https://github.com/yakutovicha/aiida-ddec",
+    "license": "MIT License",
+    "classifiers": [
+        "Programming Language :: Python"
+    ],
+    "version": "0.1.0",
+    "entry_points": {
+        "aiida.calculations": [
+            "ddec = aiida_ddec.calculations:DdecCalculation"
+        ],
+        "aiida.parsers": [
+            "ddec = aiida_ddec.calculations:DdecParser"
+        ],
+    },
+    "scripts": ["examples/cli.py"],
+    "setup_requires": ["reentry"],
+    "reentry_register": true,
+    "install_requires": [
+        "aiida >= 0.11.0"
+    ],
+    "extras_require": {
+        "testing": [
+            "aiida-core[testing]"
+        ],
+        "pre-commit": [
+            "pre-commit",
+            "yapf",
+            "prospector",
+            "pylint"
+        ],
+        "docs": [
+            "sphinx"
+        ]
+    }
+}
