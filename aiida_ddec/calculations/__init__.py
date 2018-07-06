@@ -7,11 +7,12 @@
 # For further information on the license, see the LICENSE.txt file            #
 # For further information please visit http://www.aiida.net                   #
 ###############################################################################
-
+import os
 from collections import OrderedDict
 
 from aiida.orm.calculation.job import JobCalculation
 from aiida.orm.data.parameter import ParameterData
+from aiida.orm.data.remote import RemoteData
 from aiida.common.utils import classproperty
 from aiida.common.exceptions import (InputValidationError, ValidationError)
 from aiida.common.datastructures import (CalcInfo, CodeInfo)
@@ -24,10 +25,13 @@ def input_render(input_dict):
     output = ""
     for key,value in input_dict.iteritems():
         if isinstance(value, OrderedDict):
+            output += '<' + key + '>' + '\n'
             for k,v in value.iteritems():
-                output += str(k) + ' ' + str(v)
+                output += str(k) + ' ' + str(v) + '\n'
+            output += '</' + key + '>' + '\n'
+            output += '\n'
         elif isinstance(value, list):
-            output += '<' + key + '>'
+            output += '<' + key + '>' + '\n'
             for e in value:
                 if e is True:
                     output += '.true.'
@@ -35,17 +39,20 @@ def input_render(input_dict):
                     output += '.false.'
                 else:
                     output += str(e)
-            output += '</' + key + '>'
+                output += '\n'
+            output += '</' + key + '>' + '\n'
+            output += '\n'
         else:
-            output += '<' + key + '>'
-            output += value
-            output += '</' + key + '>'
+            output += '<' + key + '>' + '\n'
+            output += str(value) + '\n'
+            output += '</' + key + '>' + '\n'
+            output += '\n'
     return output
 
 class DdecCalculation(JobCalculation):
     """
     AiiDA plugin for the ddec code that performs density derived
-    electrostatic and chemical atomic population analysis.   
+    electrostatic and chemical atomic population analysis.
     """
 
     def _init_internal_params(self):
@@ -112,6 +119,12 @@ class DdecCalculation(JobCalculation):
         except KeyError:
             raise InputValidationError("No code specified for this "
                                        "calculation")
+
+        try:
+            electronic_calc_folder = inputdict.pop('electronic_calc_folder', None)
+        except:
+            pass
+
         if inputdict:
             raise ValidationError("Unknown inputs besides ParameterData")
 
@@ -123,26 +136,30 @@ class DdecCalculation(JobCalculation):
         input_filename = tempfolder.get_abs_path(self._INPUT_FILE_NAME)
         with open(input_filename, 'w') as infile:
             infile.write(input_render(input_dict))
-        
-        # Electronic calc folder
-        electronic_calc_folder = inputdict.pop('electronic_calc_folder', None)
-        if electronic_calc_folder is not None:
-            if not isinstance(electronic_calc_folder, RemoteData):
-                msg = "electronic_calc_folder type not RemoteData"
-                raise InputValidationError(msg)
 
         # Prepare CalcInfo to be returned to aiida
         calcinfo = CalcInfo()
         calcinfo.uuid = self.uuid
         calcinfo.local_copy_list = []
         calcinfo.remote_copy_list = []
+        calcinfo.remote_symlink_list = []
         calcinfo.retrieve_list = [
             self._OUTPUT_FILE_NAME,
             [self._ADDITIONAL_RETRIEVE_LIST, '.',0]
         ]
 
+        # Electronic calc folder
+        if electronic_calc_folder is not None:
+            if not isinstance(electronic_calc_folder, RemoteData):
+                msg = "electronic_calc_folder type not RemoteData"
+                raise InputValidationError(msg)
+
+            comp_uuid = electronic_calc_folder.get_computer().uuid
+            remote_path = electronic_calc_folder.get_remote_path()+'/'+'aiida-ELECTRON_DENSITY-1_0.cube'
+            symlink = (comp_uuid, remote_path, 'valence_density.cube')
+            calcinfo.remote_symlink_list.append(symlink)
+
         codeinfo = CodeInfo()
-        # will call ./code.py in.json out.json
         codeinfo.cmdline_params = []
         codeinfo.code_uuid = code.uuid
         calcinfo.codes_info = [codeinfo]

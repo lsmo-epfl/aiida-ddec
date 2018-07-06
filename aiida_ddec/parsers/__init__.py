@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
+import re
 import json
+import tempfile
+import CifFile
+from ase.io import read
+from aiida.orm.data.cif import CifData
 from aiida.parsers.parser import Parser
 from aiida.parsers.exceptions import OutputParsingError
 from aiida.orm.data.parameter import ParameterData
 
-from aiida.orm import CalculationFactory
+from aiida.orm  import CalculationFactory
 DdecCalculation = CalculationFactory('ddec')
 
 def xyz2cif(fname):
@@ -64,14 +69,13 @@ def xyz2cif(fname):
     img0.AddItem('_space_group_name_Hall', 'P 1')
     img0.ChangeItemOrder('_space_group_name_Hall', -1)
 
-    tarball = tempfile.NamedTemporaryFile(suffix='.cif')
+    ciffile = tempfile.NamedTemporaryFile(suffix='.cif')
 
-    print tarball.name
 
-    with open(tarball.name, 'w') as f:
+    with open(ciffile.name, 'w') as f:
         f.write(cf.WriteOut())
 
-    return CifData(file=tarball.name,
+    return CifData(file=ciffile.name,
                         scan_type='flex', parse_policy='lazy')
 
 class DdecParser(Parser):
@@ -122,22 +126,19 @@ class DdecParser(Parser):
             return success, node_list
 
         finished = False
-        try:
-            with open(out_folder.get_abs_path(
-                    self._calc._OUTPUT_FILE_NAME)) as f:
-                for line in f.readlines():
-                    if "Finished chargemol in" in line:
-                        finished = True
-        if not finished: 
-            except OutputParsingError:
-                self.logger.error("Error parsing the output json")
-                return success, node_list
+        with open(out_folder.get_abs_path(self._calc._OUTPUT_FILE_NAME)) as f:
+            for line in f.readlines():
+                if "Finished chargemol in" in line:
+                    finished = True
 
-        output_data = ParameterData(dict=out_dict)
-        output_str = xyz2cif(out_folder.get_abs_path(
+        if not finished:
+            self.logger.error("Error parsing the output file")
+            return success, node_list
+
+        output_cif = xyz2cif(out_folder.get_abs_path(
                     'DDEC6_even_tempered_net_atomic_charges.xyz'))
         link_name = self.get_linkname_outparams()
-        node_list = [(link_name, output_data), ('structure', output_str)]
+        node_list = [('structure', output_cif)]
         success = True
 
         return success, node_list

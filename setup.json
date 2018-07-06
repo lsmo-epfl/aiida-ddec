@@ -14,14 +14,18 @@
             "ddec = aiida_ddec.calculations:DdecCalculation"
         ],
         "aiida.parsers": [
-            "ddec = aiida_ddec.calculations:DdecParser"
-        ],
+            "ddec = aiida_ddec.parsers:DdecParser"
+        ]
     },
     "scripts": ["examples/cli.py"],
-    "setup_requires": ["reentry"],
+    "setup_requires": [
+            "reentry"
+    ],
     "reentry_register": true,
     "install_requires": [
-        "aiida >= 0.11.0"
+        "aiida >= 0.11.0",
+        "pycifrw",
+        "ase"
     ],
     "extras_require": {
         "testing": [
