@@ -17,7 +17,6 @@
             "ddec = aiida_ddec.parsers:DdecParser"
         ]
     },
-    "scripts": ["examples/cli.py"],
     "setup_requires": [
             "reentry"
     ],

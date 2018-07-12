@@ -63,6 +63,12 @@ def xyz2cif(fname):
     img0.AddItem('_atom_site_charge', charges)
     img0.AddLoopName('_atom_site_type_symbol', '_atom_site_charge')
 
+    # Add _atom_site_label loop that is the same as _atom_site_type_symbol one
+    asts = img0.GetFullItemValue('_atom_site_type_symbol')[0]
+    img0.AddItem('_atom_site_label', asts)
+    img0.AddLoopName('_atom_site_type_symbol', '_atom_site_label')
+    img0.ChangeItemOrder('_atom_site_label', 1)
+
     # Add two more items and placing them before the loops
     img0.AddItem('_symmetry_space_group_name_H-M', 'P 1')
     img0.ChangeItemOrder('_symmetry_space_group_name_h-m', -1)

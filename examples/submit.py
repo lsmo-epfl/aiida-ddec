@@ -12,7 +12,7 @@ input_dict = {
         "net charge": 0.0,
         "charge type": "DDEC6",
         "periodicity along A, B, and C vectors" : [True, True, True,],
-        "atomic densities directory complete path" : "/scratch/snx3000/yaa/atomic_densities/",
+        "atomic densities directory complete path" : "/scratch/snx3000/ongari/atomic_densities/",
         "input filename" : "valence_density",
         "number of core electrons":[
             "1  0",
@@ -61,17 +61,18 @@ computer = Computer.get('daint-s761')
 # set up calculation
 calc = code.new_calc()
 calc.label = "Computing DDEC point charges"
+calc.set_prepend_text("export OMP_NUM_THREADS=12")
 calc.description = "Test job submission with the aiida_plugin_template plugin"
-calc.set_max_wallclock_seconds(30 * 60)  # 30 min
+calc.set_max_wallclock_seconds(4 * 60 * 60)  # 30 min
 # This line is only needed for local codes, otherwise the computer is
 # automatically set from the code
 calc.set_computer(computer)
 calc.set_withmpi(False)
-calc.set_resources({"num_machines": 1})
+calc.set_resources({"num_machines": 1, "num_mpiprocs_per_machine":1})
 calc.use_parameters(parameters)
 
 # use cp2k calculations
-cp2k_calc = load_node(15)
+cp2k_calc = load_node(2590)
 pf = cp2k_calc.out.remote_folder
 calc.use_electronic_calc_folder(pf)
 
