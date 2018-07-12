@@ -79,7 +79,7 @@ def xyz2cif(fname):
 
 
     with open(ciffile.name, 'w') as f:
-        f.write(cf.WriteOut())
+        f.write(cf.WriteOut()+'\n')
 
     return CifData(file=ciffile.name,
                         scan_type='flex', parse_policy='lazy')
