@@ -33,13 +33,22 @@ def input_render(input_dict):
         elif isinstance(value, list):
             output += '<' + key + '>' + '\n'
             for e in value:
-                if e is True:
+                if e == True:
                     output += '.true.'
-                elif e is False:
+                elif e == False:
                     output += '.false.'
                 else:
                     output += str(e)
                 output += '\n'
+            output += '</' + key + '>' + '\n'
+            output += '\n'
+        elif isinstance(value, bool):
+            output += '<' + key + '>' + '\n'
+            if value == True:
+                output += '.true.'
+            elif value == False:
+                output += '.false.'
+            output += '\n'
             output += '</' + key + '>' + '\n'
             output += '\n'
         else:

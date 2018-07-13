@@ -12,6 +12,7 @@ input_dict = {
         "net charge": 0.0,
         "charge type": "DDEC6",
         "periodicity along A, B, and C vectors" : [True, True, True,],
+        "compute BOs" : False,
         "atomic densities directory complete path" : "/scratch/snx3000/ongari/atomic_densities/",
         "input filename" : "valence_density",
         "number of core electrons":[
