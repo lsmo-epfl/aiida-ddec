@@ -65,7 +65,7 @@ class DdecCalculation(JobCalculation):
         self._INPUT_FILE_NAME = 'job_control.txt'
         self._OUTPUT_FILE_NAME = 'valence_cube_DDEC_analysis.output'
         self._ADDITIONAL_RETRIEVE_LIST = '*.xyz'
-        self._ELECTRONIC_CALC_FOLDER_NAME = 'electronic_calc/'
+        self._CHARGE_DENSITY_FOLDER = 'charge_density/'
         # template.product entry point defined in setup.json
         self._default_parser = 'ddec'
 
@@ -86,10 +86,10 @@ class DdecCalculation(JobCalculation):
                 'docstring':
                 ("Use a node that specifies the input parameters ")
             },
-            "electronic_calc_folder": {
+            "charge_density_folder": {
                'valid_types': RemoteData,
                'additional_parameter': None,
-               'linkname': 'electronic_calc_folder',
+               'linkname': 'charge_density_folder',
                'docstring': "Use a remote folder "
                             "(for restarts and similar)",
                },
@@ -121,7 +121,7 @@ class DdecCalculation(JobCalculation):
                                        "calculation")
 
         try:
-            electronic_calc_folder = inputdict.pop('electronic_calc_folder', None)
+            charge_density_folder = inputdict.pop('charge_density_folder', None)
         except:
             pass
 
@@ -148,14 +148,14 @@ class DdecCalculation(JobCalculation):
             [self._ADDITIONAL_RETRIEVE_LIST, '.',0]
         ]
 
-        # Electronic calc folder
-        if electronic_calc_folder is not None:
-            if not isinstance(electronic_calc_folder, RemoteData):
-                msg = "electronic_calc_folder type not RemoteData"
+        # Charge-density calc folder
+        if charge_density_folder is not None:
+            if not isinstance(charge_density_folder, RemoteData):
+                msg = "charge_density_folder type not RemoteData"
                 raise InputValidationError(msg)
 
-            comp_uuid = electronic_calc_folder.get_computer().uuid
-            remote_path = electronic_calc_folder.get_remote_path()+'/'+'aiida-ELECTRON_DENSITY-1_0.cube'
+            comp_uuid = charge_density_folder.get_computer().uuid
+            remote_path = charge_density_folder.get_remote_path()+'/'+'aiida-ELECTRON_DENSITY-1_0.cube'
             symlink = (comp_uuid, remote_path, 'valence_density.cube')
             calcinfo.remote_symlink_list.append(symlink)
 

@@ -12,7 +12,7 @@ input_dict = {
         "net charge": 0.0,
         "charge type": "DDEC6",
         "periodicity along A, B, and C vectors" : [True, True, True,],
-        "atomic densities directory complete path" : "/scratch/snx3000/ongari/atomic_densities/",
+        "atomic densities directory complete path" : "/home/yakutovi/chargemol_09_26_2017/atomic_densities/",
         "input filename" : "valence_density",
         "number of core electrons":[
             "1  0",
@@ -52,10 +52,10 @@ input_dict = {
 parameters = ParameterData(dict=input_dict)
 
 # use code name specified using 'verdi code setup'
-code = Code.get_from_string('ddec')
+code = Code.get_from_string('ddec@fidis')
 
 # use computer name specified using 'verdi computer setup'
-computer = Computer.get('daint-s761')
+computer = Computer.get('fidis')
 
 
 # set up calculation
@@ -72,9 +72,9 @@ calc.set_resources({"num_machines": 1, "num_mpiprocs_per_machine":1})
 calc.use_parameters(parameters)
 
 # use cp2k calculations
-cp2k_calc = load_node(2590)
+cp2k_calc = load_node(617)
 pf = cp2k_calc.out.remote_folder
-calc.use_electronic_calc_folder(pf)
+calc.use_charge_density_folder(pf)
 
 calc.store_all()
 calc.submit()
