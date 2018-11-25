@@ -15,6 +15,9 @@
         ],
         "aiida.parsers": [
             "ddec = aiida_ddec.parsers:DdecParser"
+        ],
+        "aiida.workflows": [
+            "ddec = aiida_ddec.workflows:DdecCp2kChargesWorkChain"
         ]
     },
     "setup_requires": [
