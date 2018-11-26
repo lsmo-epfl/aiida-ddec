@@ -154,7 +154,6 @@ class DdecCp2kChargesWorkChain(WorkChain):
     def prepare_ddec(self):
         """Prepare inputs for ddec point charges calculation."""
         # extract number of core electrons from the cp2k output
-        self.report("self.ctx.charge_density_calc: {}".format(str(self.ctx.charge_density_calc)))
         core_e = extract_core_electrons(self.ctx.charge_density_calc['retrieved'])
         # prepare input dictionary
         self.ctx.ddec_inputs = {
@@ -173,6 +172,7 @@ class DdecCp2kChargesWorkChain(WorkChain):
         return ToContext(ddec_calc=Outputs(running))
 
     def return_results(self):
+        self.report("DdecCp2kChargesWorkChain is completed")
         self.out('output_structure', self.ctx.ddec_calc['structure'])
 
 # EOF
