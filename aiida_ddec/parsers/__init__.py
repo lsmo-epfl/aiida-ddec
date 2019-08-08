@@ -4,12 +4,12 @@ import json
 import tempfile
 import CifFile
 from ase.io import read
-from aiida.orm.data.cif import CifData
+from aiida.orm.nodes.data.cif import CifData
 from aiida.parsers.parser import Parser
-from aiida.parsers.exceptions import OutputParsingError
-from aiida.orm.data.parameter import ParameterData
+from aiida.common import OutputParsingError
+from aiida.orm import Dict
 
-from aiida.orm  import CalculationFactory
+from aiida.plugins  import CalculationFactory
 DdecCalculation = CalculationFactory('ddec')
 
 def xyz2cif(fname):
@@ -100,7 +100,7 @@ class DdecParser(Parser):
             raise OutputParsingError("Can only parse DdecCalculation")
 
     # pylint: disable=protected-access
-    def parse_with_retrieved(self, retrieved):
+    def parse(self, **kwargs):
         """
         Parse output data folder, store results in database.
 

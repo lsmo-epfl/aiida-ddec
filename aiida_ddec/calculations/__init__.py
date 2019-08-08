@@ -10,13 +10,13 @@
 import os
 from collections import OrderedDict
 
-from aiida.orm.calculation.job import JobCalculation
-from aiida.orm.data.parameter import ParameterData
-from aiida.orm.data.remote import RemoteData
+from aiida.engine import CalcJob
+from aiida.orm import Dict
+from aiida.orm import RemoteData
 from aiida.common.utils import classproperty
-from aiida.common.exceptions import (InputValidationError, ValidationError)
-from aiida.common.datastructures import (CalcInfo, CodeInfo)
-from aiida.orm import DataFactory
+from aiida.common import (InputValidationError, ValidationError)
+from aiida.common import (CalcInfo, CodeInfo)
+from aiida.plugins import DataFactory
 
 def input_render(input_dict):
     """
@@ -58,7 +58,7 @@ def input_render(input_dict):
             output += '\n'
     return output
 
-class DdecCalculation(JobCalculation):
+class DdecCalculation(CalcJob):
     """
     AiiDA plugin for the ddec code that performs density derived
     electrostatic and chemical atomic population analysis.
@@ -105,7 +105,7 @@ class DdecCalculation(JobCalculation):
         })
         return use_dict
 
-    def _prepare_for_submission(self, tempfolder, inputdict):
+    def prepare_for_submission(self, tempfolder, inputdict):
         """
         Create input files.
 

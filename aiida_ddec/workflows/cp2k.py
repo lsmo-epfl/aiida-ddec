@@ -1,10 +1,10 @@
 from __future__ import print_function
 
-from aiida.orm import CalculationFactory, DataFactory
-from aiida.orm.code import Code
-from aiida.work import workfunction as wf
-from aiida.work.run import submit
-from aiida.work.workchain import WorkChain, ToContext, Outputs
+from aiida.plugins import CalculationFactory, DataFactory
+from aiida.orm import Code
+from aiida.engine import workfunction as wf
+from aiida.engine import submit
+from aiida.engine import WorkChain, ToContext, Outputs
 from aiida_cp2k.workflows import Cp2kDftBaseWorkChain
 from copy import deepcopy
 

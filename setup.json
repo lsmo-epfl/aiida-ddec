@@ -8,7 +8,7 @@
     "classifiers": [
         "Programming Language :: Python"
     ],
-    "version": "0.1.0",
+    "version": "1.0.0",
     "entry_points": {
         "aiida.calculations": [
             "ddec = aiida_ddec.calculations:DdecCalculation"
@@ -25,7 +25,7 @@
     ],
     "reentry_register": true,
     "install_requires": [
-        "aiida >= 0.11.0",
+        "aiida >= 1.0.0",
         "pycifrw",
         "ase"
     ],
