@@ -1,101 +1,100 @@
-#!/usr/bin/env runaiida
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import sys
-import os
+"""Example calculation on Cu-MOF-74"""
+from __future__ import print_function
+from __future__ import absolute_import
 import click
+from aiida.orm.utils import load_node
+from aiida.engine import submit
+from aiida.orm import Code, Dict
+from aiida_ddec.calculations import DdecCalculation
 
-from aiida.common.example_helpers import test_and_get_code
-from aiida.orm.data.parameter import ParameterData
+input_dict = {  # pylint: disable=invalid-name
+    'net charge': 0.0,
+    'charge type': 'DDEC6',
+    'periodicity along A, B, and C vectors': [True, True, True],
+    'compute BOs': False,
+    'atomic densities directory complete path': '/home/yakutovi/chargemol_09_26_2017/atomic_densities/',
+    'input filename': 'valence_density',
+    'number of core electrons': [
+        '1  0',
+        '2  0',
+        '3  0',
+        '4  0',
+        '5  2',
+        '6  2',
+        '7  2',
+        '8  2',
+        '9  2',
+        '10 2',
+        '11 2',
+        '12 2',
+        '13 10',
+        '14 10',
+        '15 10',
+        '16 10',
+        '17 10',
+        '18 10',
+        '19 10',
+        '20 10',
+        '21 10',
+        '22 10',
+        '23 10',
+        '24 10',
+        '25 10',
+        '26 10',
+        '27 10',
+        '28 10',
+        '29 18',
+        '30 18',
+        '35 28',
+        '53 46',
+    ],
+}
 
-input_dict = {
-        "net charge": 0.0,
-        "charge type": "DDEC6",
-        "periodicity along A, B, and C vectors" : [True, True, True,],
-        "compute BOs" : False,
-        "atomic densities directory complete path" : "/home/yakutovi/chargemol_09_26_2017/atomic_densities/",
-        "input filename" : "valence_density",
-        "number of core electrons":[
-            "1  0",
-            "2  0",
-            "3  0",
-            "4  0",
-            "5  2",
-            "6  2",
-            "7  2",
-            "8  2",
-            "9  2",
-            "10 2",
-            "11 2",
-            "12 2",
-            "13 10",
-            "14 10",
-            "15 10",
-            "16 10",
-            "17 10",
-            "18 10",
-            "19 10",
-            "20 10",
-            "21 10",
-            "22 10",
-            "23 10",
-            "24 10",
-            "25 10",
-            "26 10",
-            "27 10",
-            "28 10",
-            "29 18",
-            "30 18",
-            "35 28",
-            "53 46",
-            ]
-        }
+options = { # pylint: disable=invalid-name
+    'resources': {
+        'num_machines': 1,
+        'num_mpiprocs_per_machine': 1,
+    },
+    'max_wallclock_seconds': 1 * 30 * 60,  # 30 min
+    'withmpi': False,
+}
+
 
 @click.command('cli')
 @click.argument('codename')
 @click.argument('cp2k_calculation_pk')
-@click.option('--submit', is_flag=True, help='Actually submit calculation')
-def main(codename, cp2k_calculation_pk, submit):
+@click.option('--run', is_flag=True, help='Actually submit calculation')
+def main(codename, cp2k_calculation_pk, run):
     """Command line interface for testing and submitting calculations.
 
-    Usage: ./cli.py CODENAME CP2K_CALCULATION
-    
-    CODENAME       from "verdi code setup"
-
-    COMPUTER_NAME  from "verdi calculation list -a"
-
-    This script extends submit.py, adding flexibility in the selected code/computer.
+    Usage: verdi run cli.py CODENAME CP2K_CALCULATION
     """
-    code = test_and_get_code(codename, expected_code_type='ddec')
-
+    code = Code.get_from_string(codename)
     # input parameters
-    parameters = ParameterData(dict=input_dict)
-
-    # set up calculation
-    calc = code.new_calc()
-    calc.label = "aiida_plugin_template computes 2*3"
-    calc.description = "Test job submission with the aiida_plugin_template plugin"
-    calc.set_max_wallclock_seconds(30 * 60)  # 30 min
-
-    calc.set_withmpi(False)
-    calc.set_resources({"num_machines": 1})
-    calc.use_parameters(parameters)
-
-    # use cp2k calculations
+    parameters = Dict(dict=input_dict)
     cp2k_calc = load_node(int(cp2k_calculation_pk))
-    calc.use_charge_density_folder(cp2k_calc.out.remote_folder)
 
-    if submit:
-        calc.store_all()
-        calc.submit()
-        print("submitted calculation; calc=Calculation(uuid='{}') # ID={}"\
-                .format(calc.uuid,calc.dbnode.pk))
+    inputs = {
+        'parameters': parameters,
+        'charge_density_folder': cp2k_calc.outputs.remote_folder,
+        'code': code,
+        'metadata': {
+            'options': options,
+        }
+    }
+
+    if run:
+        submit(DdecCalculation, **inputs)
+        print('submitted calculation')
     else:
-        subfolder, script_filename = calc.submit_test()
-        path = os.path.relpath(subfolder.abspath)
-        print("submission test successful")
-        print("Find remote folder in {}".format(path))
-        print("In order to actually submit, add '--submit'")
+        inputs['metadata']['dry_run'] = True
+        inputs['metadata']['store_provenance'] = False
+        submit(DdecCalculation, **inputs)
+        print('submission test successful')
+        print("In order to actually submit, add '--run'")
 
 
 if __name__ == '__main__':
-    main()
+    main()  # pylint: disable=no-value-for-parameter

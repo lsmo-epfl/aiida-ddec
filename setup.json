@@ -1,46 +1,57 @@
 {
-    "name": "aiida-ddec",
-    "author": "Aliaksandr Yakutovich",
-    "author_email": "aliaksandr.yakutovich@epfl.ch",
-    "description": "AiiDA plugin DDEC code",
-    "url": "https://github.com/yakutovicha/aiida-ddec",
-    "license": "MIT License",
-    "classifiers": [
-        "Programming Language :: Python"
+  "name": "aiida-ddec",
+  "author": "Aliaksandr Yakutovich",
+  "author_email": "aliaksandr.yakutovich@epfl.ch",
+  "description": "AiiDA plugin DDEC code",
+  "url": "https:\/\/github.com\/yakutovicha\/aiida-ddec",
+  "license": "MIT License",
+  "classifiers": [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 2.7",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Development Status :: 2 - Pre-Alpha"
+  ],
+  "version": "1.0.0a1",
+  "entry_points": {
+    "aiida.calculations": [
+      "ddec = aiida_ddec.calculations:DdecCalculation"
     ],
-    "version": "0.1.0",
-    "entry_points": {
-        "aiida.calculations": [
-            "ddec = aiida_ddec.calculations:DdecCalculation"
-        ],
-        "aiida.parsers": [
-            "ddec = aiida_ddec.parsers:DdecParser"
-        ],
-        "aiida.workflows": [
-            "ddec = aiida_ddec.workflows:DdecCp2kChargesWorkChain"
-        ]
-    },
-    "setup_requires": [
-            "reentry"
+    "aiida.parsers": [
+      "ddec = aiida_ddec.parsers:DdecParser"
     ],
-    "reentry_register": true,
-    "install_requires": [
-        "aiida >= 0.11.0",
-        "pycifrw",
-        "ase"
+    "aiida.workflows": [
+      "ddec.relax = aiida_ddec.workflows:DdecCp2kRelaxChargesWorkChain",
+      "ddec.sp = aiida_ddec.workflows:DdecCp2kSpChargesWorkChain"
+    ]
+  },
+  "setup_requires": [
+    "reentry"
+  ],
+  "data_files": [
+    [
+      ".",
+      [
+        "setup.json"
+      ]
+    ]
+  ],
+  "reentry_register": true,
+  "install_requires": [
+    "aiida_core >= 1.0.0b5",
+    "pycifrw",
+    "ase",
+    "six"
+  ],
+  "extras_require": {
+    "pre-commit": [
+      "pre-commit",
+      "yapf",
+      "prospector",
+      "pylint"
     ],
-    "extras_require": {
-        "testing": [
-            "aiida-core[testing]"
-        ],
-        "pre-commit": [
-            "pre-commit",
-            "yapf",
-            "prospector",
-            "pylint"
-        ],
-        "docs": [
-            "sphinx"
-        ]
-    }
+    "testing": [
+      "pytest"
+    ]
+  }
 }
