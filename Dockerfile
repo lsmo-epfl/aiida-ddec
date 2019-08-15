@@ -1,6 +1,6 @@
 FROM yakutovich/aiida-complete
 
-RUN apt-get update && apt-get install -y cp2k && service rabbitmq-server start
+RUN apt-get update && apt-get install -y cp2k
 
 # Install AiiDA
 USER aiida
