@@ -79,4 +79,4 @@ class Cp2kDdecWorkChain(WorkChain):
         #self.out_many(self.exposed_outputs(self.ctx.ddec_calc, DdecCalculation)) WHY NOT WORKING?
         ddec_cif = self.ctx.ddec_calc.outputs.structure_ddec
         self.out('structure_ddec', ddec_cif)
-        self.report('DdecCp2kChargesWorkChain is completed: structure w/DDEC charges CifData<{}>'.format(ddec_cif.pk))
+        self.report('DDEC charges computed: CifData<{}>'.format(ddec_cif.pk))

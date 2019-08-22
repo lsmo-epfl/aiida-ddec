@@ -21,8 +21,8 @@ class Cp2kMultistageDdecWorkChain(WorkChain):
         """Define workflow specification."""
         super(Cp2kMultistageDdecWorkChain, cls).define(spec)
 
-        spec.expose_inputs(Cp2kMultistageWorkChain, namespace='cp2k_ms')
-        spec.expose_inputs(Cp2kDdecWorkChain, namespace='cp2k_ddec')
+        spec.expose_inputs(Cp2kMultistageWorkChain)
+        spec.expose_inputs(Cp2kDdecWorkChain)
 
         # specify the chain of calculations to be performed
         spec.outline(
@@ -35,7 +35,7 @@ class Cp2kMultistageDdecWorkChain(WorkChain):
 
     def run_cp2kmultistage(self):
         """Run CP2K-Multistage"""
-        cp2k_ms_inputs = AttributeDict(self.exposed_inputs(Cp2kMultistageWorkChain, 'cp2k_ms'))
+        cp2k_ms_inputs = AttributeDict(self.exposed_inputs(Cp2kMultistageWorkChain))
         running = self.submit(Cp2kMultistageWorkChain, **cp2k_ms_inputs)
         self.report('Running Cp2MultistageWorkChain to move the structure')
         return ToContext(ms_wc=running)
@@ -44,8 +44,7 @@ class Cp2kMultistageDdecWorkChain(WorkChain):
         """Pass the Cp2kMultistageWorkChain outputs as inputs for
         Cp2kDdecWorkChain: cp2k_params, structure and WFN.
         """
-
-        cp2k_ddec_inputs = AttributeDict(self.exposed_inputs(Cp2kDdecWorkChain, 'cp2k_ddec'))
+        cp2k_ddec_inputs = AttributeDict(self.exposed_inputs(Cp2kDdecWorkChain))
         cp2k_ddec_inputs['cp2k_base']['cp2k']['parameters'] = self.ctx.ms_wc.outputs.last_input_parameters
         cp2k_ddec_inputs['cp2k_base']['cp2k']['structure'] = self.ctx.ms_wc.outputs.output_structure
         cp2k_ddec_inputs['cp2k_base']['cp2k']['parent_calc_folder'] = self.ctx.ms_wc.outputs.remote_folder
@@ -56,5 +55,3 @@ class Cp2kMultistageDdecWorkChain(WorkChain):
         """Return exposed outputs and print the pk of the CifData w/DDEC"""
         self.out_many(self.exposed_outputs(self.ctx.ms_wc, Cp2kMultistageWorkChain))
         self.out_many(self.exposed_outputs(self.ctx.cp2k_ddec_wc, Cp2kDdecWorkChain))
-        ddec_cif = self.ctx.cp2k_ddec_wc.outputs.structure_ddec
-        self.report('DdecCp2kChargesWorkChain is completed: structure w/DDEC charges CifData<{}>'.format(ddec_cif.pk))

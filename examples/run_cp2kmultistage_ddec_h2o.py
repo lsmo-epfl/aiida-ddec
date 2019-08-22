@@ -59,33 +59,21 @@ def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
         'metadata': {
             'label': 'test-h2o'
         },
-        'cp2k_ms': {
-            'protocol_tag': Str('test'),
-            'cp2k_base': {
-                'cp2k': {
-                    'structure': structure,
-                    'code': cp2k_code,
-                    'metadata': {
-                        'options': cp2k_options,
-                    }
+        'protocol_tag': Str('test'),
+        'cp2k_base': {
+            'cp2k': {
+                'structure': structure,
+                'code': cp2k_code,
+                'metadata': {
+                    'options': cp2k_options,
                 }
             }
         },
-        'cp2k_ddec': {
-            'cp2k_base': {
-                'cp2k': {
-                    'code': cp2k_code,
-                    'metadata': {
-                        'options': cp2k_options,
-                    }
-                }
-            },
-            'ddec': {
-                'parameters': ddec_params,
-                'code': ddec_code,
-                'metadata': {
-                    'options': ddec_options,
-                }
+        'ddec': {
+            'parameters': ddec_params,
+            'code': ddec_code,
+            'metadata': {
+                'options': ddec_options,
             }
         }
     }
