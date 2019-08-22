@@ -133,6 +133,6 @@ class DdecParser(Parser):
             os.path.join(out_folder._repository._get_base_folder().abspath,
                          'DDEC6_even_tempered_net_atomic_charges.xyz'))
 
-        self.out('structure', output_cif)
+        self.out('structure_ddec', output_cif)
 
         return ExitCode(0)

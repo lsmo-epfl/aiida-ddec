@@ -60,7 +60,6 @@ class DdecCalculation(CalcJob):
 
     _DEFAULT_INPUT_FILE = 'job_control.txt'
     _DEFAULT_OUTPUT_FILE = 'valence_cube_DDEC_analysis.output'
-    _DEFAULT_CHARGE_DENSITY_FOLDER = 'charge_density/'
     _DEFAULT_ADDITIONAL_RETRIEVE_LIST = '*.xyz'  # pylint: disable=invalid-name
 
     @classmethod
@@ -70,19 +69,16 @@ class DdecCalculation(CalcJob):
         """
         # reuse base class function
         super(DdecCalculation, cls).define(spec)
-        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='ddec')
         spec.input(
             'parameters',
             valid_type=Dict,
-            help='use a node that specifies the input parameters',
+            help='Input parameters such as net charge, protocol, atomic densities path, ...',
         )
-        spec.input(
-            'charge_density_folder',
-            valid_type=RemoteData,
-            required=False,
-            help='Use a remote folder '
-            '(for restarts and similar)',
+        spec.input('charge_density_folder',valid_type=RemoteData,required=False,
+                   help='Use a remote folder (for restarts and similar)',
         )
+        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='ddec')
+        spec.input('metadata.options.withmpi', valid_type=bool, default=False)
 
         #  exit codes
         spec.exit_code(
@@ -95,8 +91,7 @@ class DdecCalculation(CalcJob):
             'ERROR_NO_OUTPUT_FILE',
             message='The retrieved folder does not contain an output file.',
         )
-
-        spec.output('structure', valid_type=CifData, required=True, help='structure with DDEC charges')
+        spec.output('structure_ddec', valid_type=CifData, required=True, help='structure with DDEC charges')
 
     def prepare_for_submission(self, folder):
         """Create the input files from the input nodes passed
@@ -106,15 +101,10 @@ class DdecCalculation(CalcJob):
         :return: `aiida.common.datastructures.CalcInfo` instance
         """
 
-        parameters = self.inputs.parameters
-        code = self.inputs.code
-
-        input_dict = parameters.get_dict()
-
         # Write input to file
         input_filename = folder.get_abs_path(self._DEFAULT_INPUT_FILE)
         with open(input_filename, 'w') as infile:
-            infile.write(input_render(input_dict))
+            infile.write(input_render(self.inputs.parameters.get_dict()))
 
         # Prepare CalcInfo to be returned to aiida
         calcinfo = CalcInfo()
@@ -127,7 +117,7 @@ class DdecCalculation(CalcJob):
             [self._DEFAULT_ADDITIONAL_RETRIEVE_LIST, '.', 0],
         ]
 
-        # Charge-density calc folder
+        # Charge-density remotefolder (now working only for CP2K)
         if 'charge_density_folder' in self.inputs:
             charge_density_folder = self.inputs.charge_density_folder
             comp_uuid = charge_density_folder.computer.uuid
@@ -140,7 +130,7 @@ class DdecCalculation(CalcJob):
 
         codeinfo = CodeInfo()
         codeinfo.cmdline_params = []
-        codeinfo.code_uuid = code.uuid
+        codeinfo.code_uuid = self.inputs.code.uuid
         calcinfo.codes_info = [codeinfo]
 
         return calcinfo
