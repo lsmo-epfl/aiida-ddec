@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """utils for the workchains"""
+
 from __future__ import absolute_import
 import os
 from aiida.engine import workfunction as wf
@@ -37,10 +38,13 @@ def merge_Dict(p1, p2):  # pylint: disable=invalid-name
 
 
 @wf
-def extract_core_electrons(charge_density_folder):
-    """Return dictionary with number of core electrons"""
-    fn = os.path.join(charge_density_folder.value, 'aiida.out')  # pylint: disable=invalid-name
-    with open(fn) as f:  # pylint: disable=invalid-name
+def extract_core_electrons(cp2k_remote_folder):
+    """Read from the cp2k.out the number of core electrons (included in the
+    pseudopotential) and print them as a Dict
+    """
+    cp2k_out_dir = cp2k_remote_folder.creator.outputs.retrieved._repository._get_base_folder().abspath  # pylint: disable=protected-access
+    cp2k_out_file = os.path.join(cp2k_out_dir, 'aiida.out')
+    with open(cp2k_out_file) as f:  # pylint: disable=invalid-name
         content = f.readlines()
     for n_line, line in enumerate(content):
         if '- Atoms:' in line:
