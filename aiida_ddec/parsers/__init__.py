@@ -1,41 +1,43 @@
 # -*- coding: utf-8 -*-
+"""AiiDA DDEC plugin parser"""
+from __future__ import absolute_import
 import re
+import os
 import json
 import tempfile
 import CifFile
 from ase.io import read
-from aiida.orm.data.cif import CifData
+from aiida.orm.nodes.data.cif import CifData
 from aiida.parsers.parser import Parser
-from aiida.parsers.exceptions import OutputParsingError
-from aiida.orm.data.parameter import ParameterData
+from aiida.common import NotExistent, OutputParsingError
+from aiida.orm import Dict
+from aiida.engine import ExitCode
+from aiida.plugins import CalculationFactory
 
-from aiida.orm  import CalculationFactory
-DdecCalculation = CalculationFactory('ddec')
+DdecCalculation = CalculationFactory('ddec')  # pylint: disable=invalid-name
+
 
 def xyz2cif(fname):
     """
     Convert xyz file produced by DDEC program to a cif file.
     """
-    f = open(fname)
-    lines = f.readlines()
-    f.close()
+    with open(fname, 'r') as file:
+        lines = file.readlines()
 
     # Number of atoms
     natoms = int(lines[0])
 
     # Extract an array of charges
     cell_string = lines[1]
-    charges = [ i.split()[4] for i in lines[2:natoms+2] ]
+    charges = [i.split()[4] for i in lines[2:natoms + 2]]
 
     # Extract cell
-    cell_unformatted = re.search(r"\[.*?\]",
-                                cell_string).group(0)[1:-1].split(',')
-    cell = [re.search(r"\{.*?\}", e).group(0)[1:-1].split()
-            for e in cell_unformatted]
+    cell_unformatted = re.search(r'\[.*?\]', cell_string).group(0)[1:-1].split(',')
+    cell = [re.search(r'\{.*?\}', e).group(0)[1:-1].split() for e in cell_unformatted]
 
-    # Create a temporary file that contains the structure 
+    # Create a temporary file that contains the structure
     # in cif format
-    buf = tempfile.TemporaryFile()
+    buf = tempfile.TemporaryFile(mode='w+')
 
     # Create an ase object, specify unitcell
     # write it into the buffer file
@@ -43,15 +45,14 @@ def xyz2cif(fname):
     ase_obj.set_cell(cell)
     ase_obj.write(buf, format='cif')
 
-
     # Read the cif file into from the buffer a CifFile
     # object
     buf.seek(0)
-    cf = CifFile.ReadCif(buf)
+    _ciffile = CifFile.ReadCif(buf)
     buf.close()
 
     # Manipulate the cif parameters
-    img0 = cf.dictionary['image0']
+    img0 = _ciffile.dictionary['image0']
     img0.RemoveItem('_atom_site_label')
     img0.RemoveItem('_atom_site_occupancy')
     img0.RemoveItem('_atom_site_thermal_displace_type')
@@ -77,75 +78,61 @@ def xyz2cif(fname):
 
     ciffile = tempfile.NamedTemporaryFile(suffix='.cif')
 
+    with open(ciffile.name, 'w') as file:
+        file.write(_ciffile.WriteOut() + '\n')
 
-    with open(ciffile.name, 'w') as f:
-        f.write(cf.WriteOut()+'\n')
+    return CifData(file=ciffile.name, scan_type='flex', parse_policy='lazy')
 
-    return CifData(file=ciffile.name,
-                        scan_type='flex', parse_policy='lazy')
 
 class DdecParser(Parser):
     """
     Parser class for parsing output of multiplication.
     """
 
-    def __init__(self, calculation):
-        """
-        Initialize Parser instance
-        """
-        super(DdecParser, self).__init__(calculation)
-
-        # check for valid input
-        if not isinstance(calculation, DdecCalculation):
-            raise OutputParsingError("Can only parse DdecCalculation")
-
     # pylint: disable=protected-access
-    def parse_with_retrieved(self, retrieved):
+    def parse(self, **kwargs):
         """
         Parse output data folder, store results in database.
 
         :param retrieved: a dictionary of retrieved nodes, where
           the key is the link name
-        :returns: a tuple with two values ``(bool, node_list)``, 
+        :returns: a tuple with two values ``(bool, node_list)``,
           where:
 
           * ``bool``: variable to tell if the parsing succeeded
           * ``node_list``: list of new nodes to be stored in the db
             (as a list of tuples ``(link_name, node)``)
         """
-        success = False
-        node_list = ()
 
         # Check that the retrieved folder is there
         try:
-            out_folder = retrieved[self._calc._get_linkname_retrieved()]
-        except KeyError:
-            self.logger.error("No retrieved folder found")
-            return success, node_list
+            out_folder = self.retrieved
+        except NotExistent:
+            self.logger.error('No retrieved folder found')
+            return self.exit_codes.ERROR_NO_RETRIEVED_FOLDER
 
         # Check what is inside the folder
-        list_of_files = out_folder.get_folder_list()
+        list_of_files = out_folder._repository.list_object_names()  # pylint: disable=protected-access
+
+        output_file = self.node.process_class._DEFAULT_OUTPUT_FILE
 
         # We need at least the output file name as defined in calcs.py
-        if self._calc._OUTPUT_FILE_NAME not in list_of_files:
-            self.logger.error("Output file not found")
-            return success, node_list
+        if output_file not in list_of_files:
+            raise self.exit_codes.ERROR_NO_OUTPUT_FILE
 
         finished = False
-        with open(out_folder.get_abs_path(self._calc._OUTPUT_FILE_NAME)) as f:
-            for line in f.readlines():
-                if "Finished chargemol in" in line:
+        with open(os.path.join(out_folder._repository._get_base_folder().abspath, output_file)) as file:  # pylint: disable=protected-access
+            for line in file.readlines():
+                if 'Finished chargemol in' in line:
                     finished = True
 
         if not finished:
-            self.logger.error("Error parsing the output file")
-            return success, node_list
+            raise OutputParsingError('Calculation did not finish correctly')
 
-        output_cif = xyz2cif(out_folder.get_abs_path(
-                    'DDEC6_even_tempered_net_atomic_charges.xyz'))
-        link_name = self.get_linkname_outparams()
-        node_list = [('structure', output_cif)]
-        success = True
+        output_cif = xyz2cif(
+            os.path.join(out_folder._repository._get_base_folder().abspath,
+                         'DDEC6_even_tempered_net_atomic_charges.xyz'))
 
-        return success, node_list
+        self.out('structure_ddec', output_cif)
 
+        return ExitCode(0)
