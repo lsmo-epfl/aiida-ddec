@@ -9,11 +9,12 @@ import click
 import ase.build
 
 from aiida.engine import run
-from aiida.orm import Code, Dict
+from aiida.orm import Code, Dict, Str
 from aiida.plugins import DataFactory
 from aiida_ddec.workchains import Cp2kMultistageDdecWorkChain
 
-StructureData = DataFactory('structure')
+StructureData = DataFactory('structure')  # pylint: disable=invalid-name
+
 
 @click.command('cli')
 @click.argument('cp2k_code_string')
@@ -21,9 +22,10 @@ StructureData = DataFactory('structure')
 @click.argument('ddec_atdens_path')
 def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
     """Example usage:
-    verdi run run_cp2k_charges_h2o.py cp2k-5.1@localhost ddec@localhost /home/daniele/Programs/aiida-database/data/chargemol_09_26_2017/atomic_densities/
+    $ATDENS_PATH='/home/daniele/Programs/aiida-database/data/chargemol_09_26_2017/atomic_densities/'
+    verdi run run_cp2k_charges_h2o.py cp2k-5.1@localhost ddec@localhost $ATDENS_PATH
     """
-    print("Testing CP2K-Multistage calculation + DDEC on H2O...")
+    print('Testing CP2K-Multistage calculation + DDEC on H2O...')
 
     cp2k_code = Code.get_from_string(cp2k_code_string)
     ddec_code = Code.get_from_string(ddec_code_string)
@@ -33,13 +35,17 @@ def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
     structure = StructureData(ase=atoms)
 
     cp2k_options = {
-        'resources': {'num_machines': 1},
+        'resources': {
+            'num_machines': 1
+        },
         'max_wallclock_seconds': 10 * 60,
         'withmpi': True,
     }
 
     ddec_options = {
-        'resources': {'num_machines': 1},
+        'resources': {
+            'num_machines': 1
+        },
         'max_wallclock_seconds': 10 * 60,
         'withmpi': False,
     }
@@ -52,8 +58,7 @@ def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
             'compute BOs': False,
             'atomic densities directory complete path': ddec_atdens_path,
             'input filename': 'valence_density',
-        }
-    )
+        })
 
     inputs = {
         'metadata': {
@@ -80,5 +85,6 @@ def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
 
     run(Cp2kMultistageDdecWorkChain, **inputs)
 
+
 if __name__ == '__main__':
-    main()
+    main()  # pylint: disable=no-value-for-parameter
