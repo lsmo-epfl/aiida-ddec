@@ -15,14 +15,12 @@ pip install git+ https://github.com/yakutovicha/aiida-ddec
 
 Examples in the `examples` folder:
 
--   `cli.py`: DDEC calculation starting from a old CP2K calculation
+-   `cp2k_ddec.py`: workchain that run an ENERGY calculation in cp2k printing the
+    electron density cube file, and compute the DDEC charges from that
 
--   `cp2k_relax_charges.py`: runs a workchain that first relaxes a structure using
-     multistage CP2K workchains and then performs a DDEC calculation on the relaxed
-    structure
-
--   `cp2k_sp_charges.py`: runs a workchain that first runs a CP2K single point
-    calculation and then performs a DDEC calculation on the charge desnity
+-   `cp2kmultistage_ddec.py`: combines the CP2K Multistage workflow (e.g., to relax
+    the structure) and the previous workchain, to get the DDEC charges of the
+    relaxed structure
 
 ## License
 

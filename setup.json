@@ -21,8 +21,8 @@
       "ddec = aiida_ddec.parsers:DdecParser"
     ],
     "aiida.workflows": [
-      "ddec.relax = aiida_ddec.workflows:DdecCp2kRelaxChargesWorkChain",
-      "ddec.sp = aiida_ddec.workflows:DdecCp2kSpChargesWorkChain"
+      "ddec.cp2k_ddec = aiida_ddec.workchains:Cp2kDdecWorkChain",
+      "ddec.cp2kmultistage_ddec = aiida_ddec.workchains:Cp2kMultistageDdecWorkChain"
     ]
   },
   "setup_requires": [
