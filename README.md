@@ -1,6 +1,6 @@
-# aiida-coolcode
+# aiida-ddec plugin
 
-a ddec plugin for AiiDA
+AiiDA plugin for the DDEC code
 
 # Installation
 
@@ -12,10 +12,6 @@ pip install -e .  # also installs aiida, if missing (but not postgres)
 verdi quicksetup  # better to set up a new profile
 verdi calculation plugins  # should now show your calclulation plugins
 ```
-
-# Usage
-
-
 
 # License
 
