@@ -11,6 +11,14 @@ A [DDEC](https://sourceforge.net/projects/ddec/files/) plugin for AiiDA.
 pip install git+ https://github.com/yakutovicha/aiida-ddec
 ```
 
+### (development mode with code checking)
+
+```shell
+pip install -e .
+pip install pre-commit yapf prospector pylint
+pre-commit install
+```
+
 ## Usage
 
 Examples in the `examples` folder:

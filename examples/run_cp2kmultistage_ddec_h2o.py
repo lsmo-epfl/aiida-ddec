@@ -22,8 +22,8 @@ StructureData = DataFactory('structure')  # pylint: disable=invalid-name
 @click.argument('ddec_atdens_path')
 def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
     """Example usage:
-    $ATDENS_PATH='/home/daniele/Programs/aiida-database/data/chargemol_09_26_2017/atomic_densities/'
-    verdi run run_cp2k_charges_h2o.py cp2k-5.1@localhost ddec@localhost $ATDENS_PATH
+    ATDENS_PATH='/home/daniele/Programs/aiida-database/data/chargemol_09_26_2017/atomic_densities/'
+    verdi run run_cp2kmultistage_ddec_h2o.py cp2k-5.1@localhost ddec@localhost $ATDENS_PATH
     """
     print('Testing CP2K-Multistage calculation + DDEC on H2O...')
 
