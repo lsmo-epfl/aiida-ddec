@@ -74,8 +74,11 @@ class DdecCalculation(CalcJob):
             valid_type=Dict,
             help='Input parameters such as net charge, protocol, atomic densities path, ...',
         )
-        spec.input('charge_density_folder',valid_type=RemoteData,required=False,
-                   help='Use a remote folder (for restarts and similar)',
+        spec.input(
+            'charge_density_folder',
+            valid_type=RemoteData,
+            required=False,
+            help='Use a remote folder (for restarts and similar)',
         )
         spec.input('metadata.options.parser_name', valid_type=six.string_types, default='ddec')
         spec.input('metadata.options.withmpi', valid_type=bool, default=False)
