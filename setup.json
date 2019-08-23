@@ -49,10 +49,6 @@
       "yapf",
       "prospector",
       "pylint"
-    ],
-    "testing": [
-      "pytest",
-      "pgtest"
     ]
   }
 }
