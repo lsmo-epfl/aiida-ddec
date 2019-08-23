@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 """DdecCp2kChargesWorkChain workchain of the AiiDA DDEC plugin"""
-from __future__ import absolute_import
-from copy import deepcopy
 
-from aiida_cp2k.workchains import Cp2kBaseWorkChain
+from __future__ import absolute_import
+
 from aiida.common import AttributeDict
 from aiida.engine import WorkChain, ToContext
-from aiida.orm import Dict, Code, Str
+from aiida.orm import Dict
 from aiida.plugins import CalculationFactory, DataFactory
-from .utils import dict_merge, merge_Dict, extract_core_electrons
 
-DdecCalculation = CalculationFactory('ddec')
-CifData = DataFactory('cif')
+from aiida_cp2k.workchains import Cp2kBaseWorkChain
+from .utils import merge_Dict, extract_core_electrons
+
+DdecCalculation = CalculationFactory('ddec')  # pylint: disable=invalid-name
+CifData = DataFactory('cif')  # pylint: disable=invalid-name
+
 
 class Cp2kDdecWorkChain(WorkChain):
     """A workchain that computes DDEC charges after a single-point
@@ -26,11 +28,7 @@ class Cp2kDdecWorkChain(WorkChain):
         spec.expose_inputs(Cp2kBaseWorkChain, namespace='cp2k_base')
         spec.expose_inputs(DdecCalculation, namespace='ddec')
 
-        spec.outline(
-            cls.run_cp2k,
-            cls.run_ddec,
-            cls.return_results
-        )
+        spec.outline(cls.run_cp2k, cls.run_ddec, cls.return_results)
 
         spec.expose_outputs(Cp2kBaseWorkChain, include=['remote_folder'])
         spec.expose_outputs(DdecCalculation, include=['structure_ddec'])
@@ -40,20 +38,25 @@ class Cp2kDdecWorkChain(WorkChain):
         and run the ENERGY calculation
         """
 
-        param_modify = Dict( dict={
-            'GLOBAL' : {
-                'RUN_TYPE': 'ENERGY'
-            },
-            'FORCE_EVAL': {
-                'DFT': {
-                    'PRINT': {
-                        'E_DENSITY_CUBE': {
-                            '_': 'ON',
-                            'STRIDE': '1 1 1'
-        }}}}}).store()
+        param_modify = Dict(
+            dict={
+                'GLOBAL': {
+                    'RUN_TYPE': 'ENERGY'
+                },
+                'FORCE_EVAL': {
+                    'DFT': {
+                        'PRINT': {
+                            'E_DENSITY_CUBE': {
+                                '_': 'ON',
+                                'STRIDE': '1 1 1'
+                            }
+                        }
+                    }
+                }
+            }).store()
 
         cp2k_base_inputs = AttributeDict(self.exposed_inputs(Cp2kBaseWorkChain, 'cp2k_base'))
-        cp2k_base_inputs['cp2k']['parameters'] = merge_Dict(cp2k_base_inputs['cp2k']['parameters'],param_modify)
+        cp2k_base_inputs['cp2k']['parameters'] = merge_Dict(cp2k_base_inputs['cp2k']['parameters'], param_modify)
         running = self.submit(Cp2kBaseWorkChain, **cp2k_base_inputs)
         self.report('Running Cp2kBaseWorkChain to compute the charge-density')
         return ToContext(cp2k_calc=running)
@@ -76,7 +79,7 @@ class Cp2kDdecWorkChain(WorkChain):
     def return_results(self):
         """Return exposed outputs and print the pk of the CifData w/DDEC"""
         self.out_many(self.exposed_outputs(self.ctx.cp2k_calc, Cp2kBaseWorkChain))
-        #self.out_many(self.exposed_outputs(self.ctx.ddec_calc, DdecCalculation)) WHY NOT WORKING?
+        #self.out_many(self.exposed_outputs(self.ctx.ddec_calc, DdecCalculation)) #will work with aiida-core>1.0.0b5
         ddec_cif = self.ctx.ddec_calc.outputs.structure_ddec
         self.out('structure_ddec', ddec_cif)
         self.report('DDEC charges computed: CifData<{}>'.format(ddec_cif.pk))
