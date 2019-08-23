@@ -17,10 +17,10 @@ USER aiida
 ENV PATH="${HOME}/.local/bin:${PATH}"
 
 # Download and install Chargemol
-#WORKDIR ${HOME}/code/
-#RUN wget https://sourceforge.net/projects/ddec/files/latest/download -O chargemol.zip
-#RUN unzip chargemol.zip
-#RUN chmod 755 chargemol_09_26_2017/chargemol_FORTRAN_09_26_2017/compiled_binaries/linux/Chargemol_09_26_2017_linux_parallel
+WORKDIR ${HOME}/code/
+RUN wget https://sourceforge.net/projects/ddec/files/latest/download -O chargemol.zip
+RUN unzip chargemol.zip
+RUN chmod 755 chargemol_09_26_2017/chargemol_FORTRAN_09_26_2017/compiled_binaries/linux/Chargemol_09_26_2017_linux_parallel
 
 
 # Install aiida-ddec plugin and it's dependencies
