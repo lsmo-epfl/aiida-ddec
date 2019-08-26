@@ -1,85 +1,106 @@
 # -*- coding: utf-8 -*-
 """AiiDA DDEC plugin parser"""
+from __future__ import print_function
 from __future__ import absolute_import
+
 import re
 import os
 import json
 import tempfile
-import CifFile
-from ase.io import read
+import math
+from numpy.linalg import inv
 from aiida.orm.nodes.data.cif import CifData
 from aiida.parsers.parser import Parser
 from aiida.common import NotExistent, OutputParsingError
 from aiida.orm import Dict
 from aiida.engine import ExitCode
 from aiida.plugins import CalculationFactory
+from six.moves import range
 
 DdecCalculation = CalculationFactory('ddec')  # pylint: disable=invalid-name
 
 
-def xyz2cif(fname):
-    """
-    Convert xyz file produced by DDEC program to a cif file.
-    """
-    with open(fname, 'r') as file:
-        lines = file.readlines()
+def xyz2cif(fname):  # pylint: disable=too-many-statements
+    """Convert xyz file produced by DDEC program to a cif file."""
+    # parse .xyz file
+    file = open(fname, 'r')
+    natom = int(file.readline().split()[0])
+    data = file.readline().split()
+    cell = []
+    cell.append([float(data[10]), float(data[11]), float(data[12])])
+    cell.append([float(data[15]), float(data[16]), float(data[17])])
+    cell.append([float(data[20]), float(data[21]), float(data[22])])
+    atom_element = []
+    atom_xyz = []
+    atom_charge = []
+    for i in range(natom):
+        data = file.readline().split()
+        atom_element.append(data[0])
+        atom_xyz.append([float(data[1]), float(data[2]), float(data[3])])
+        if len(data) == 5:
+            atom_charge.append(float(data[4]))
+    file.close()
 
-    # Number of atoms
-    natoms = int(lines[0])
+    # convert to lengths, angles and fractional coordinates
+    length = []
+    angle = []
+    length.append(math.sqrt(cell[0][0] * cell[0][0] + cell[0][1] * cell[0][1] + cell[0][2] * cell[0][2]))
+    length.append(math.sqrt(cell[1][0] * cell[1][0] + cell[1][1] * cell[1][1] + cell[1][2] * cell[1][2]))
+    length.append(math.sqrt(cell[2][0] * cell[2][0] + cell[2][1] * cell[2][1] + cell[2][2] * cell[2][2]))
+    angle.append(
+        math.degrees(
+            math.acos((cell[1][0] * cell[2][0] + cell[1][1] * cell[2][1] + cell[1][2] * cell[2][2]) / length[1] /
+                      length[2])))  #alpha=B^C
+    angle.append(
+        math.degrees(
+            math.acos((cell[0][0] * cell[2][0] + cell[0][1] * cell[2][1] + cell[0][2] * cell[2][2]) / length[0] /
+                      length[2])))  #beta=A^C
+    angle.append(
+        math.degrees(
+            math.acos((cell[0][0] * cell[1][0] + cell[0][1] * cell[1][1] + cell[0][2] * cell[1][2]) / length[0] /
+                      length[1])))  #gamma=A^B
+    atom_fract = [[0.0] * 3 for i in range(natom)]
+    invcell = inv(cell)
+    for i in range(natom):
+        for j in range(3):
+            atom_fract[i][j] = atom_xyz[i][0] * invcell[0][j] + \
+                               atom_xyz[i][1] * invcell[1][j] + \
+                               atom_xyz[i][2] * invcell[2][j]
 
-    # Extract an array of charges
-    cell_string = lines[1]
-    charges = [i.split()[4] for i in lines[2:natoms + 2]]
-
-    # Extract cell
-    cell_unformatted = re.search(r'\[.*?\]', cell_string).group(0)[1:-1].split(',')
-    cell = [re.search(r'\{.*?\}', e).group(0)[1:-1].split() for e in cell_unformatted]
-
-    # Create a temporary file that contains the structure
-    # in cif format
-    buf = tempfile.TemporaryFile(mode='w+')
-
-    # Create an ase object, specify unitcell
-    # write it into the buffer file
-    ase_obj = read(fname)
-    ase_obj.set_cell(cell)
-    ase_obj.write(buf, format='cif')
-
-    # Read the cif file into from the buffer a CifFile
-    # object
-    buf.seek(0)
-    _ciffile = CifFile.ReadCif(buf)
-    buf.close()
-
-    # Manipulate the cif parameters
-    img0 = _ciffile.dictionary['image0']
-    img0.RemoveItem('_atom_site_label')
-    img0.RemoveItem('_atom_site_occupancy')
-    img0.RemoveItem('_atom_site_thermal_displace_type')
-    img0.RemoveItem('_atom_site_B_iso_or_equiv')
-    img0.ChangeItemOrder('_atom_site_type_symbol', 0)
-
-    # Add chaages and placing them into the _atom_site_charge
-    # loop
-    img0.AddItem('_atom_site_charge', charges)
-    img0.AddLoopName('_atom_site_type_symbol', '_atom_site_charge')
-
-    # Add _atom_site_label loop that is the same as _atom_site_type_symbol one
-    asts = img0.GetFullItemValue('_atom_site_type_symbol')[0]
-    img0.AddItem('_atom_site_label', asts)
-    img0.AddLoopName('_atom_site_type_symbol', '_atom_site_label')
-    img0.ChangeItemOrder('_atom_site_label', 1)
-
-    # Add two more items and placing them before the loops
-    img0.AddItem('_symmetry_space_group_name_H-M', 'P 1')
-    img0.ChangeItemOrder('_symmetry_space_group_name_h-m', -1)
-    img0.AddItem('_space_group_name_Hall', 'P 1')
-    img0.ChangeItemOrder('_space_group_name_Hall', -1)
-
+    # print .cif file
     ciffile = tempfile.NamedTemporaryFile(suffix='.cif')
-
-    with open(ciffile.name, 'w') as file:
-        file.write(_ciffile.WriteOut() + '\n')
+    ofile = open(ciffile.name, 'w')
+    print('data_crystal', file=ofile)
+    print(' ', file=ofile)
+    print('_audit_creation_method AiiDA-ddec_plugin ', file=ofile)
+    print(' ', file=ofile)
+    print('_cell_length_a    %.5f' % length[0], file=ofile)
+    print('_cell_length_b    %.5f' % length[1], file=ofile)
+    print('_cell_length_c    %.5f' % length[2], file=ofile)
+    print('_cell_angle_alpha %.5f' % angle[0], file=ofile)
+    print('_cell_angle_beta  %.5f' % angle[1], file=ofile)
+    print('_cell_angle_gamma %.5f' % angle[2], file=ofile)
+    print(' ', file=ofile)
+    print("_symmetry_space_group_name_Hall 'P 1'", file=ofile)
+    print("_symmetry_space_group_name_H-M  'P 1'", file=ofile)
+    print(' ', file=ofile)
+    print('loop_', file=ofile)
+    print('_symmetry_equiv_pos_as_xyz', file=ofile)
+    print(" 'x,y,z' ", file=ofile)
+    print(' ', file=ofile)
+    print('loop_', file=ofile)
+    print('_atom_site_label', file=ofile)
+    print('_atom_site_type_symbol', file=ofile)
+    print('_atom_site_fract_x', file=ofile)
+    print('_atom_site_fract_y', file=ofile)
+    print('_atom_site_fract_z', file=ofile)
+    print('_atom_site_charge', file=ofile)
+    for i in range(natom):
+        print('{0:10} {1:5} {2:>9.5f} {3:>9.5f} {4:>9.5f} {5:>9.5f}'.format(atom_element[i], atom_element[i],
+                                                                            atom_fract[i][0], atom_fract[i][1],
+                                                                            atom_fract[i][2], atom_charge[i]),
+              file=ofile)
+    ofile.close()
 
     return CifData(file=ciffile.name, scan_type='flex', parse_policy='lazy')
 
