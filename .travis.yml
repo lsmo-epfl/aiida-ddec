@@ -11,7 +11,7 @@ script:
   - sleep 30 # wait untill the container is launched
   - "export DOCKERID=`docker ps -qf 'ancestor=aiida_ddec_test'`"
   - "echo \"Docker ID: $DOCKERID\""
-  - "docker exec -it --user aiida \"$DOCKERID\" /bin/bash -l -c 'cd code/aiida-ddec/test && ./run_tests.sh'"
+  - "docker exec -it --user aiida \"$DOCKERID\" /bin/bash -l -c 'cd code/aiida-ddec && ./run_tests.sh'"
 
 git:
   depth: 3

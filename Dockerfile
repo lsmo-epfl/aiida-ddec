@@ -25,7 +25,7 @@ RUN chmod 755 chargemol_09_26_2017/chargemol_FORTRAN_09_26_2017/compiled_binarie
 
 # Install aiida-ddec plugin and it's dependencies
 WORKDIR ${HOME}/code/aiida-ddec
-RUN pip install --user .[cp2k,pre-commit,testing]
+RUN pip install --user -e .[cp2k,pre-commit,testing]
 
 # Populate reentry cache for aiida user https://pypi.python.org/pypi/reentry/
 RUN reentry scan

@@ -8,7 +8,7 @@ set -o pipefail
 pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
 
 # Run pytest
-pytest ..
+pytest
 
 # run single calculation tests
 
