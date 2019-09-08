@@ -25,8 +25,12 @@ class Cp2kDdecWorkChain(WorkChain):
         """Define workflow specification."""
         super(Cp2kDdecWorkChain, cls).define(spec)
 
-        spec.expose_inputs(Cp2kBaseWorkChain, namespace='cp2k_base')
+        spec.expose_inputs(Cp2kBaseWorkChain, namespace='cp2k_base', exclude=['cp2k.parameters'])
         spec.expose_inputs(DdecCalculation, namespace='ddec')
+        spec.input('cp2k_base.cp2k.parameters',
+                   valid_type=Dict,
+                   required=False,
+                   help='Specify custom CP2K settings that will be overwritten just before submitting the CalcJob')
 
         spec.outline(cls.run_cp2k, cls.run_ddec, cls.return_results)
 
