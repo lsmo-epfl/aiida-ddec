@@ -22,7 +22,7 @@ class Cp2kMultistageDdecWorkChain(WorkChain):
         super(Cp2kMultistageDdecWorkChain, cls).define(spec)
 
         spec.expose_inputs(Cp2kMultistageWorkChain)
-        spec.expose_inputs(Cp2kDdecWorkChain)
+        spec.expose_inputs(Cp2kDdecWorkChain, exclude=['cp2k_base'])
 
         # specify the chain of calculations to be performed
         spec.outline(cls.run_cp2kmultistage, cls.run_cp2kddec, cls.return_results)
@@ -39,9 +39,10 @@ class Cp2kMultistageDdecWorkChain(WorkChain):
 
     def run_cp2kddec(self):
         """Pass the Cp2kMultistageWorkChain outputs as inputs for
-        Cp2kDdecWorkChain: cp2k_params, structure and WFN.
+        Cp2kDdecWorkChain: cp2k_base (metadata), cp2k_params, structure and WFN.
         """
         cp2k_ddec_inputs = AttributeDict(self.exposed_inputs(Cp2kDdecWorkChain))
+        cp2k_ddec_inputs['cp2k_base'] = self.exposed_inputs(Cp2kMultistageWorkChain)['cp2k_base']
         cp2k_ddec_inputs['cp2k_base']['cp2k']['parameters'] = self.ctx.ms_wc.outputs.last_input_parameters
         cp2k_ddec_inputs['cp2k_base']['cp2k']['structure'] = self.ctx.ms_wc.outputs.output_structure
         cp2k_ddec_inputs['cp2k_base']['cp2k']['parent_calc_folder'] = self.ctx.ms_wc.outputs.remote_folder
