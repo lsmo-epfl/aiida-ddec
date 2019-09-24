@@ -83,7 +83,5 @@ class Cp2kDdecWorkChain(WorkChain):
     def return_results(self):
         """Return exposed outputs and print the pk of the CifData w/DDEC"""
         self.out_many(self.exposed_outputs(self.ctx.cp2k_calc, Cp2kBaseWorkChain))
-        #self.out_many(self.exposed_outputs(self.ctx.ddec_calc, DdecCalculation)) #will work with aiida-core>1.0.0b5
-        ddec_cif = self.ctx.ddec_calc.outputs.structure_ddec
-        self.out('structure_ddec', ddec_cif)
-        self.report('DDEC charges computed: CifData<{}>'.format(ddec_cif.pk))
+        self.out_many(self.exposed_outputs(self.ctx.ddec_calc, DdecCalculation))
+        self.report('DDEC charges computed: CifData<{}>'.format(self.outputs['structure_ddec'].pk))
