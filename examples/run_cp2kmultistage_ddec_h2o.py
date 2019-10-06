@@ -58,7 +58,8 @@ def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
             'compute BOs': False,
             'atomic densities directory complete path': ddec_atdens_path,
             'input filename': 'valence_density',
-        })
+        }
+    )
 
     inputs = {
         'metadata': {

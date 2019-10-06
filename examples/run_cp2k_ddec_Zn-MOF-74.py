@@ -1,19 +1,20 @@
-#!/usr/bin/env python
+#!/usr/bin/env python  # pylint: disable=invalid-name
 # -*- coding: utf-8 -*-
 """ Test/example for the DdecCp2kChargesWorkChain"""
 
 from __future__ import print_function
 from __future__ import absolute_import
 
+import os
+import ase.io
 import click
-import ase.build
 
 from aiida.engine import run
 from aiida.orm import Code, Dict
 from aiida.plugins import DataFactory, WorkflowFactory
 
-Cp2kDdecWorkChain = WorkflowFactory('ddec.cp2k_ddec')  # pylint: disable=invalid-name
-StructureData = DataFactory('structure')  # pylint: disable=invalid-name
+Cp2kDdecWorkChain = WorkflowFactory('ddec.cp2k_ddec')
+StructureData = DataFactory('structure')
 
 
 @click.command('cli')
@@ -23,16 +24,15 @@ StructureData = DataFactory('structure')  # pylint: disable=invalid-name
 def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
     """Example usage:
     ATDENS_PATH='/home/daniele/Programs/aiida-database/data/chargemol_09_26_2017/atomic_densities/'
-    verdi run run_cp2k_ddec_h2o.py cp2k-5.1@localhost ddec@localhost $ATDENS_PATH
+    verdi run run_cp2k_ddec_MOF-74.py cp2k@localhost ddec@localhost $ATDENS_PATH
     """
     print('Testing CP2K ENERGY calculation + DDEC on H2O...')
 
     cp2k_code = Code.get_from_string(cp2k_code_string)
     ddec_code = Code.get_from_string(ddec_code_string)
 
-    atoms = ase.build.molecule('H2O')
-    atoms.center(vacuum=2.0)
-    structure = StructureData(ase=atoms)
+    thisdir = os.path.dirname(os.path.abspath(__file__))
+    structure = StructureData(ase=ase.io.read(os.path.join(thisdir, 'data/Zn-MOF-74.cif')))
 
     cp2k_options = {
         'resources': {
@@ -56,37 +56,41 @@ def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
                 'METHOD': 'Quickstep',
                 'DFT': {
                     'BASIS_SET_FILE_NAME': 'BASIS_MOLOPT',
-                    'QS': {
-                        'EPS_DEFAULT': 1.0e-12,
-                        'WF_INTERPOLATION': 'ps',
-                        'EXTRAPOLATION_ORDER': 3,
-                    },
                     'MGRID': {
                         'NGRIDS': 4,
                         'CUTOFF': 280,
                         'REL_CUTOFF': 30,
                     },
+                    'SCF': {
+                        'MAX_SCF': 3,  # limited for testing purpose
+                    },
                     'XC': {
                         'XC_FUNCTIONAL': {
-                            '_': 'LDA',
+                            '_': 'PBE',
                         },
-                    },
-                    'POISSON': {
-                        'PERIODIC': 'none',
-                        'PSOLVER': 'MT',
                     },
                 },
                 'SUBSYS': {
                     'KIND': [
                         {
-                            '_': 'O',
-                            'BASIS_SET': 'DZVP-MOLOPT-SR-GTH',
-                            'POTENTIAL': 'GTH-LDA-q6'
+                            '_': 'H',
+                            'BASIS_SET': 'SZV-MOLOPT-SR-GTH',
+                            'POTENTIAL': 'GTH-PBE'
                         },
                         {
-                            '_': 'H',
-                            'BASIS_SET': 'DZVP-MOLOPT-SR-GTH',
-                            'POTENTIAL': 'GTH-LDA-q1'
+                            '_': 'C',
+                            'BASIS_SET': 'SZV-MOLOPT-SR-GTH',
+                            'POTENTIAL': 'GTH-PBE'
+                        },
+                        {
+                            '_': 'O',
+                            'BASIS_SET': 'SZV-MOLOPT-SR-GTH',
+                            'POTENTIAL': 'GTH-PBE'
+                        },
+                        {
+                            '_': 'Zn',
+                            'BASIS_SET': 'SZV-MOLOPT-SR-GTH',
+                            'POTENTIAL': 'GTH-PBE'
                         },
                     ],
                 },
@@ -107,7 +111,7 @@ def main(cp2k_code_string, ddec_code_string, ddec_atdens_path):
 
     inputs = {
         'metadata': {
-            'label': 'test-h2o'
+            'label': 'test-MOF-74'
         },
         'cp2k_base': {
             'cp2k': {

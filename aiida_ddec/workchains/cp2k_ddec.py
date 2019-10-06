@@ -6,11 +6,11 @@ from __future__ import absolute_import
 from aiida.common import AttributeDict
 from aiida.engine import WorkChain, ToContext
 from aiida.orm import Dict
-from aiida.plugins import CalculationFactory, DataFactory
+from aiida.plugins import CalculationFactory, DataFactory, WorkflowFactory
 
-from aiida_cp2k.workchains import Cp2kBaseWorkChain
-from .utils import merge_Dict, extract_core_electrons
+from aiida_ddec.utils import merge_Dict, extract_core_electrons
 
+Cp2kBaseWorkChain = WorkflowFactory('cp2k.base')  # pylint: disable=invalid-name
 DdecCalculation = CalculationFactory('ddec')  # pylint: disable=invalid-name
 CifData = DataFactory('cif')  # pylint: disable=invalid-name
 
@@ -53,7 +53,8 @@ class Cp2kDdecWorkChain(WorkChain):
                         }
                     }
                 }
-            }).store()
+            }
+        ).store()
 
         cp2k_base_inputs = AttributeDict(self.exposed_inputs(Cp2kBaseWorkChain, 'cp2k_base'))
         cp2k_base_inputs['cp2k']['parameters'] = merge_Dict(cp2k_base_inputs['cp2k']['parameters'], param_modify)
@@ -79,7 +80,5 @@ class Cp2kDdecWorkChain(WorkChain):
     def return_results(self):
         """Return exposed outputs and print the pk of the CifData w/DDEC"""
         self.out_many(self.exposed_outputs(self.ctx.cp2k_calc, Cp2kBaseWorkChain))
-        #self.out_many(self.exposed_outputs(self.ctx.ddec_calc, DdecCalculation)) #will work with aiida-core>1.0.0b5
-        ddec_cif = self.ctx.ddec_calc.outputs.structure_ddec
-        self.out('structure_ddec', ddec_cif)
-        self.report('DDEC charges computed: CifData<{}>'.format(ddec_cif.pk))
+        self.out_many(self.exposed_outputs(self.ctx.ddec_calc, DdecCalculation))
+        self.report('DDEC charges computed: CifData<{}>'.format(self.outputs['structure_ddec'].pk))
