@@ -53,7 +53,8 @@ class Cp2kDdecWorkChain(WorkChain):
                         }
                     }
                 }
-            }).store()
+            }
+        ).store()
 
         cp2k_base_inputs = AttributeDict(self.exposed_inputs(Cp2kBaseWorkChain, 'cp2k_base'))
         cp2k_base_inputs['cp2k']['parameters'] = merge_Dict(cp2k_base_inputs['cp2k']['parameters'], param_modify)
