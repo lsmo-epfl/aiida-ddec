@@ -38,20 +38,19 @@
   ],
   "reentry_register": true,
   "install_requires": [
-    "aiida_core >= 1.0.0b5",
-    "pycifrw",
-    "ase",
+    "aiida_core >= 1.0.0b6",
     "six"
   ],
-  "extras_require": {
-    "pre-commit": [
-      "pre-commit",
-      "yapf",
-      "prospector",
-      "pylint"
-    ],
-    "testing": [
-      "pytest"
+    "extras_require": {
+        "testing": [
+            "pytest==4.4.1"
+        ],
+    "pre-commit":[
+            "pre-commit==1.17.0",
+            "yapf==0.28.0",
+            "prospector==1.1.7",
+            "pylint==1.9.4; python_version<'3.0'",
+            "pylint==2.3.1; python_version>='3.0'"
     ]
-  }
+    }
 }
