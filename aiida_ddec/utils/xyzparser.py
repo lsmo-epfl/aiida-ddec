@@ -8,8 +8,36 @@ from numpy import dot
 from numpy.linalg import inv, norm
 from six.moves import map
 
-from CifFile.CifFile_module import CifFile
-from CifFile.StarFile import StarBlock
+from aiida.plugins import DataFactory
+
+CifData = DataFactory('cif')  # pylint: disable=invalid-name
+
+CIF_HEADER = """data_crystal
+
+_audit_creation_method 'AiiDA-DDEC plugin'
+
+_cell_length_a        {a:8.5f}
+_cell_length_b        {b:8.5f}
+_cell_length_c        {c:8.5f}
+
+_cell_angle_alpha     {alpha:8.5f}
+_cell_angle_alpha     {beta:8.5f}
+_cell_angle_alpha     {gamma:8.5f}
+
+_symmetry_space_group_name_Hall 'P 1'
+_symmetry_space_group_name_H-M  'P 1'
+
+loop_
+_symmetry_equiv_pos_as_xyz
+ 'x,y,z'
+
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_charge"""
 
 
 def xyzparser(fname):
@@ -23,7 +51,7 @@ def xyzparser(fname):
     # Cell
     cell_string = lines[1]
     cell_unformatted = re.search(r'\[.*?\]', cell_string).group(0)[1:-1].split(',')
-    cell = [re.search(r'\{.*?\}', e).group(0)[1:-1].split() for e in cell_unformatted]
+    cell = [list(map(float, re.search(r'\{.*?\}', e).group(0)[1:-1].split())) for e in cell_unformatted]
 
     # Atoms
     atoms = [i.split()[0] for i in lines[2:natoms + 2]]
@@ -72,37 +100,14 @@ def xyz2cif(fname):
     # Transform cartensian coordinates into the fractional ones
     fract_xyz = dot(xyz, inv(cell))
 
-    # Prepare an output cif object
-    output_cif = CifFile()
-    output_cif['crystal'] = StarBlock()
-
-    # Extract only the relevant data
-    output_cif['crystal'].AddItem('_cell_length_a', cell_a)
-    output_cif['crystal'].AddItem('_cell_length_b', cell_b)
-    output_cif['crystal'].AddItem('_cell_length_c', cell_c)
-    output_cif['crystal'].AddItem('_cell_angle_alpha', alpha)
-    output_cif['crystal'].AddItem('_cell_angle_beta', beta)
-    output_cif['crystal'].AddItem('_cell_angle_gamma', gamma)
-    output_cif['crystal'].AddItem('_symmetry_space_group_name_Hall', 'P 1')
-    output_cif['crystal'].AddItem('_symmetry_space_group_name_H-M', 'P 1')
-
-    # Extract loops
-    output_cif['crystal'].AddItem('_atom_site_label', atoms)
-    output_cif['crystal'].AddItem('_atom_site_type_symbol', atoms)
-    output_cif['crystal'].AddItem('_atom_site_fract_x', fract_xyz[:, 0])
-    output_cif['crystal'].AddItem('_atom_site_fract_y', fract_xyz[:, 1])
-    output_cif['crystal'].AddItem('_atom_site_fract_z', fract_xyz[:, 2])
-    output_cif['crystal'].AddItem('_atom_site_charge', charges)
-
-    output_cif['crystal'].CreateLoop(LOOPS_TO_EXTRACT)
-
-    # Remove comments and empty lines
-    output = [l.strip() for l in output_cif.WriteOut(comment=' ').splitlines()]
-    output = [l for l in output if l != '' and not l.startswith('#')]
-
     # Create and return a CifFile object
     ciffile = tempfile.NamedTemporaryFile(suffix='.cif')
     with open(ciffile.name, 'w') as file:
-        file.write(output_cif.WriteOut() + '\n')
-
-    return ciffile.name
+        file.write(CIF_HEADER.format(a=cell_a, b=cell_b, c=cell_c, alpha=alpha, beta=beta, gamma=gamma))
+        for i, atm in enumerate(atoms):
+            file.write(
+                '{atm:10} {atm:5} {x:>9.5f} {y:>9.5f} {z:>9.5f} {c:>9.5f}'.format(
+                    atm=atm, x=fract_xyz[i][0], y=fract_xyz[i][1], z=fract_xyz[i][2], c=charges[i]
+                )
+            )
+    return CifData(file=ciffile.name, scan_type='flex', parse_policy='lazy')

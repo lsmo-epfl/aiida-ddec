@@ -5,11 +5,10 @@ import os
 from aiida.parsers.parser import Parser
 from aiida.common import NotExistent, OutputParsingError
 from aiida.engine import ExitCode
-from aiida.plugins import CalculationFactory, DataFactory
+from aiida.plugins import CalculationFactory
 from aiida_ddec.utils import xyz2cif
 
 DdecCalculation = CalculationFactory('ddec')  # pylint: disable=invalid-name
-CifData = DataFactory('cif')  # pylint: disable=invalid-name
 
 
 class DdecParser(Parser):
@@ -47,16 +46,11 @@ class DdecParser(Parser):
             raise OutputParsingError('Calculation did not finish correctly')
 
         # Create CifData object from the following the file path returned by xyz2cif
-        output_cif = CifData(
-            file=xyz2cif(
-                os.path.join(
-                    out_folder._repository._get_base_folder().abspath, 'DDEC6_even_tempered_net_atomic_charges.xyz'
-                )
-            ),
-            scan_type='flex',
-            parse_policy='lazy'
+        output_cif = xyz2cif(
+            os.path.join(
+                out_folder._repository._get_base_folder().abspath, 'DDEC6_even_tempered_net_atomic_charges.xyz'
+            )
         )
-
         self.out('output_structure', output_cif)
 
         return ExitCode(0)
