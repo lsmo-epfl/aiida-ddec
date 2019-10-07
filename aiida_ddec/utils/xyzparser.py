@@ -76,16 +76,6 @@ def cell2angles(cell):
     return alpha, beta, gamma
 
 
-LOOPS_TO_EXTRACT = [
-    '_atom_site_label',
-    '_atom_site_type_symbol',
-    '_atom_site_fract_x',
-    '_atom_site_fract_y',
-    '_atom_site_fract_z',
-    '_atom_site_charge',
-]
-
-
 def xyz2cif(fname):
     """
     Convert xyz file produced by DDEC program to a cif file.
