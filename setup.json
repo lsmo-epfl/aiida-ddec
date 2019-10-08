@@ -21,8 +21,7 @@
       "ddec = aiida_ddec.parsers:DdecParser"
     ],
     "aiida.workflows": [
-      "ddec.cp2k_ddec = aiida_ddec.workchains:Cp2kDdecWorkChain",
-      "ddec.cp2kmultistage_ddec = aiida_ddec.workchains:Cp2kMultistageDdecWorkChain"
+      "ddec.cp2k_ddec = aiida_ddec.workchains:Cp2kDdecWorkChain"
     ]
   },
   "setup_requires": [
