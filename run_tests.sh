@@ -8,8 +8,7 @@ set -o pipefail
 pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
 
 # Run pytest
-pytest
-
+# pytest
 
 # run workflows
 verdi run examples/run_cp2k_ddec_h2o.py cp2k@localhost ddec@localhost  ~/code/chargemol_09_26_2017/atomic_densities/
