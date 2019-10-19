@@ -1,0 +1,8 @@
+label: ddec
+computer: localhost
+description:
+input_plugin: ddec
+on_computer: True
+remote_abs_path: /home/aiida/code/chargemol_09_26_2017/chargemol_FORTRAN_09_26_2017/compiled_binaries/linux/Chargemol_09_26_2017_linux_parallel
+append_text:
+prepend_text:
