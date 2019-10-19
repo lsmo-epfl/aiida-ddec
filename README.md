@@ -1,22 +1,38 @@
 # aiida-ddec plugin
 
-AiiDA plugin for the DDEC code
+[![Build Status](https://travis-ci.org/yakutovicha/aiida-ddec.svg?branch=develop)](https://travis-ci.org/yakutovicha/aiida-ddec)
+[![PyPI version](https://badge.fury.io/py/aiida-ddec.svg)](https://badge.fury.io/py/aiida-ddec)
 
-# Installation
+A [DDEC](https://sourceforge.net/projects/ddec/files/) plugin for AiiDA.
+
+## Installation
 
 ```shell
-git clone https://github.com/yakutovicha/aiida-ddec
-cd aiida-ddec
-pip install -e .  # also installs aiida, if missing (but not postgres)
-#pip install -e .[precommit,testing] # install extras for more features
-verdi quicksetup  # better to set up a new profile
-verdi calculation plugins  # should now show your calclulation plugins
+pip install git+ https://github.com/yakutovicha/aiida-ddec
 ```
 
-# License
+### (development mode with code checking)
+
+```shell
+pip install -e .['pre-commit','testing']
+pre-commit install
+```
+
+## Usage
+
+Examples in the `examples` folder:
+
+-   `cp2k_ddec.py`: workchain that run an ENERGY calculation in cp2k printing the
+    electron density cube file, and compute the DDEC charges from that
+
+-   `cp2kmultistage_ddec.py`: combines the CP2K Multistage workflow (e.g., to relax
+    the structure) and the previous workchain, to get the DDEC charges of the
+    relaxed structure
+
+## License
 
 MIT
 
-# Contact
+## Contact
 
 aliaksandr.yakutovich@epfl.ch
