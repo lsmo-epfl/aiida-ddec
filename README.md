@@ -1,8 +1,7 @@
 # aiida-ddec plugin
 
-=======
-[![Build Status](https://dev.azure.com/shoppingkj/aiida_ddec/_apis/build/status/kjappelbaum.aiida-ddec?branchName=aiida1)](https://dev.azure.com/shoppingkj/aiida_ddec/_build/latest?definitionId=1&branchName=aiida1)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/85523701e2f943d0b285516b9bc03c5c)](https://www.codacy.com/app/kjappelbaum/aiida-ddec?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kjappelbaum/aiida-ddec&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.org/yakutovicha/aiida-ddec.svg?branch=develop)](https://travis-ci.org/yakutovicha/aiida-ddec)
+[![PyPI version](https://badge.fury.io/py/aiida-ddec.svg)](https://badge.fury.io/py/aiida-ddec)
 
 A [DDEC](https://sourceforge.net/projects/ddec/files/) plugin for AiiDA.
 
