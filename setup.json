@@ -1,18 +1,18 @@
 {
   "name": "aiida-ddec",
+  "version": "1.0.0a1",
+  "license": "MIT License",
   "author": "Aliaksandr Yakutovich",
   "author_email": "aliaksandr.yakutovich@epfl.ch",
   "description": "AiiDA plugin DDEC code",
   "url": "https:\/\/github.com\/yakutovicha\/aiida-ddec",
-  "license": "MIT License",
   "classifiers": [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
-    "Development Status :: 2 - Pre-Alpha"
+    "Development Status :: 3 - Alpha"
   ],
-  "version": "1.0.0a1",
   "entry_points": {
     "aiida.calculations": [
       "ddec = aiida_ddec.calculations:DdecCalculation"
