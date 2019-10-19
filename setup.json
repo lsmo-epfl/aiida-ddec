@@ -42,7 +42,7 @@
   ],
   "extras_require": {
     "cp2k":[
-      "aiida-cp2k>=1.0.0b3"
+      "aiida-cp2k>=1.0.0b4"
     ],
     "pre-commit": [
       "pre-commit==1.17.0",
