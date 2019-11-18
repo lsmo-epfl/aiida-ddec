@@ -58,6 +58,8 @@ class Cp2kDdecWorkChain(WorkChain):
 
         cp2k_base_inputs = AttributeDict(self.exposed_inputs(Cp2kBaseWorkChain, 'cp2k_base'))
         cp2k_base_inputs['cp2k']['parameters'] = merge_Dict(cp2k_base_inputs['cp2k']['parameters'], param_modify)
+        cp2k_base_inputs['metadata']['label'] = 'cp2k_energy'
+        cp2k_base_inputs['metadata']['call_link_label'] = 'call_cp2k_energy'
         running = self.submit(Cp2kBaseWorkChain, **cp2k_base_inputs)
         self.report('Running Cp2kBaseWorkChain to compute the charge-density')
         return ToContext(cp2k_calc=running)
@@ -71,6 +73,7 @@ class Cp2kDdecWorkChain(WorkChain):
         ddec_inputs = AttributeDict(self.exposed_inputs(DdecCalculation, 'ddec'))
         ddec_inputs['charge_density_folder'] = self.ctx.cp2k_calc.outputs.remote_folder.creator.outputs.remote_folder
         ddec_inputs['parameters'] = merge_Dict(ddec_inputs['parameters'], core_e)
+        ddec_inputs['metadata']['call_link_label'] = 'call_ddec_calc'
 
         # Create the calculation process and launch it
         running = self.submit(DdecCalculation, **ddec_inputs)
