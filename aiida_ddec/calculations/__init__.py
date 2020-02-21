@@ -82,6 +82,15 @@ class DdecCalculation(CalcJob):
         )
         spec.input('metadata.options.parser_name', valid_type=six.string_types, default='ddec')
         spec.input('metadata.options.withmpi', valid_type=bool, default=False)
+        spec.input(
+            'metadata.options.resources',
+            valid_type=dict,
+            default={
+                'num_machines': 1,
+                'num_mpiprocs_per_machine': 1,
+                'tot_num_mpiprocs': 1,
+            }
+        )
 
         #  exit codes
         spec.exit_code(
