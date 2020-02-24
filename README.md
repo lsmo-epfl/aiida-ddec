@@ -25,10 +25,6 @@ Examples in the `examples` folder:
 -   `cp2k_ddec.py`: workchain that run an ENERGY calculation in cp2k printing the
     electron density cube file, and compute the DDEC charges from that
 
--   `cp2kmultistage_ddec.py`: combines the CP2K Multistage workflow (e.g., to relax
-    the structure) and the previous workchain, to get the DDEC charges of the
-    relaxed structure
-
 ## License
 
 MIT
