@@ -39,7 +39,8 @@
   "reentry_register": true,
   "install_requires": [
     "aiida_core >= 1.0.0b6",
-    "six"
+    "six",
+    "voluptuous"
   ],
   "extras_require": {
     "cp2k":[

@@ -4,6 +4,7 @@ from __future__ import absolute_import
 import os
 from collections import OrderedDict
 import six
+from voluptuous import Schema, Optional
 from aiida.engine import CalcJob
 from aiida.orm import Dict
 from aiida.orm import RemoteData
@@ -52,6 +53,23 @@ def input_render(input_dict):
     return output
 
 
+PARAMETERS_SCHEMA = Schema(
+    {
+        'net charge': float,
+        'charge type': str,
+        'periodicity along A, B, and C vectors': [bool, bool, bool],
+        'compute BOs': bool,
+        Optional('atomic densities directory complete path'): str,
+        'input filename': str,
+    },
+    required=True,
+)
+
+
+def validate_parameters(parameters):
+    PARAMETERS_SCHEMA(parameters.get_dict())
+
+
 class DdecCalculation(CalcJob):
     """
     AiiDA plugin for the ddec code that performs density derived
@@ -61,6 +79,7 @@ class DdecCalculation(CalcJob):
     _DEFAULT_INPUT_FILE = 'job_control.txt'
     _DEFAULT_OUTPUT_FILE = 'valence_cube_DDEC_analysis.output'
     _DEFAULT_ADDITIONAL_RETRIEVE_LIST = '*.xyz'  # pylint: disable=invalid-name
+    _CODE_PATH_EXTRA = 'DDEC_ATOMIC_DENSITIES_DIRECTORY'
 
     @classmethod
     def define(cls, spec):
@@ -72,6 +91,7 @@ class DdecCalculation(CalcJob):
         spec.input(
             'parameters',
             valid_type=Dict,
+            validator=validate_parameters,
             help='Input parameters such as net charge, protocol, atomic densities path, ...',
         )
         spec.input(
@@ -113,10 +133,24 @@ class DdecCalculation(CalcJob):
         :return: `aiida.common.datastructures.CalcInfo` instance
         """
 
+        # Determine atomic densities directory
+        pm_dict = self.inputs.parameters.get_dict()
+        path_key = 'atomic densities directory complete path'
+        if path_key not in pm_dict:
+            pm_dict[path_key] = self.inputs.code.extras.get(self._CODE_PATH_EXTRA)
+
+        if not pm_dict[path_key]:
+            raise ValueError("No value for '{}' - either provide in input parameters or set extra '{}' on the code." \
+                             .format(path_key, self._CODE_PATH_EXTRA))
+
+        # The directory must end with a slash or chargemol crashes
+        if not pm_dict[path_key].endswith('/'):
+            pm_dict[path_key] += '/'
+
         # Write input to file
         input_filename = folder.get_abs_path(self._DEFAULT_INPUT_FILE)
         with open(input_filename, 'w') as infile:
-            infile.write(input_render(self.inputs.parameters.get_dict()))
+            infile.write(input_render(pm_dict))
 
         # Prepare CalcInfo to be returned to aiida
         calcinfo = CalcInfo()
