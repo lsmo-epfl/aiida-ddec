@@ -80,17 +80,11 @@ class DdecCalculation(CalcJob):
             required=False,
             help='Use a remote folder (for restarts and similar)',
         )
-        spec.input('metadata.options.parser_name', valid_type=six.string_types, default='ddec')
-        spec.input('metadata.options.withmpi', valid_type=bool, default=False)
-        spec.input(
-            'metadata.options.resources',
-            valid_type=dict,
-            default={
-                'num_machines': 1,
-                'num_mpiprocs_per_machine': 1,
-                'tot_num_mpiprocs': 1,
-            }
-        )
+        spec.inputs['metadata']['options']['parser_name'].default = 'ddec'
+        spec.inputs['metadata']['options']['resources'].default = {
+            'num_machines': 1,
+        }
+        spec.inputs['metadata']['options']['withmpi'].default = False
 
         #  exit codes
         spec.exit_code(
