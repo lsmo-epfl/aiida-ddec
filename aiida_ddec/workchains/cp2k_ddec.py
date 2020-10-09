@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 """DdecCp2kChargesWorkChain workchain of the AiiDA DDEC plugin"""
-
-from __future__ import absolute_import
-
 from aiida.common import AttributeDict
 from aiida.engine import WorkChain, ToContext
 from aiida.orm import Dict

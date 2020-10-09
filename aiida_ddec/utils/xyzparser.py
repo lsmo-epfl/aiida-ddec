@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 """Convert XYZ to CIF keeping the charges"""
-from __future__ import absolute_import
 import re
 import tempfile
 from math import degrees, acos

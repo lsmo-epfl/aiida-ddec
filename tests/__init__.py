@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Helper functions and classes for tests
 """
 from __future__ import absolute_import
@@ -12,7 +11,8 @@ executables = {'cp2k': 'cp2k', 'ddec': 'ddec'}  # pylint: disable=invalid-name
 
 
 def get_backend():
-    from aiida.backends.profile import BACKEND_DJANGO, BACKEND_SQLA
+    """Get Backend"""
+    from aiida.backends import BACKEND_DJANGO, BACKEND_SQLA  #pylint: disable=import-outside-toplevel
     if os.environ.get('TEST_AIIDA_BACKEND') == BACKEND_SQLA:
         return BACKEND_SQLA
     return BACKEND_DJANGO
@@ -26,7 +26,7 @@ def get_path_to_executable(executable):
     :rtype: str
     """
     # pylint issue https://github.com/PyCQA/pylint/issues/73
-    import distutils.spawn  # pylint: disable=no-name-in-module,import-error
+    import distutils.spawn  #pylint: disable=import-outside-toplevel
     path = distutils.spawn.find_executable(executable)
     if path is None:
         raise ValueError('{} executable not found in PATH.'.format(executable))
@@ -36,14 +36,14 @@ def get_path_to_executable(executable):
 
 def get_computer(name):
     """Set up localhost computer"""
-    from aiida.orm import Computer
-    from aiida.common import NotExistent
+    from aiida.orm import Computer  #pylint: disable=import-outside-toplevel
+    from aiida.common import NotExistent  #pylint: disable=import-outside-toplevel
 
     try:
         computer = Computer.objects.get(name=name)
     except NotExistent:
 
-        import tempfile
+        import tempfile  #pylint: disable=import-outside-toplevel
         computer = Computer(
             name=name,
             description='localhost computer set up by aiida_zeopp tests',
@@ -60,8 +60,8 @@ def get_computer(name):
 
 def get_code(entry_point, computer_name='localhost-test'):
     """Set up code on provided computer"""
-    from aiida.orm import Code
-    from aiida.common import NotExistent
+    from aiida.orm import Code  #pylint: disable=import-outside-toplevel
+    from aiida.common import NotExistent  #pylint: disable=import-outside-toplevel
 
     computer = get_computer(computer_name)
     executable = executables[entry_point]
@@ -87,7 +87,7 @@ def get_temp_folder():
 
     Useful for calculation.submit_test()
     """
-    from aiida.common.folders import Folder
-    import tempfile
+    from aiida.common.folders import Folder  #pylint: disable=import-outside-toplevel
+    import tempfile  #pylint: disable=import-outside-toplevel
 
     return Folder(tempfile.mkdtemp())

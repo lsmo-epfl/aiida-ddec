@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """utils for the workchains"""
-
-from __future__ import absolute_import
 import os
-from aiida.engine import workfunction as wf
+from aiida.engine import workfunction
 from aiida.orm import Dict
 
 
@@ -17,7 +14,7 @@ def dict_merge(dct, merge_dct):
     :param merge_dct: dct merged into dct
     :return: None
     """
-    import collections
+    import collections  #pylint: disable=import-outside-toplevel
 
     for k, _ in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], collections.Mapping)):
@@ -26,7 +23,7 @@ def dict_merge(dct, merge_dct):
             dct[k] = merge_dct[k]
 
 
-@wf
+@workfunction
 def merge_Dict(p1, p2):  # pylint: disable=invalid-name
     """
     Workfunction to merge two dictionaries p1 and p2 recursively.
@@ -37,7 +34,7 @@ def merge_Dict(p1, p2):  # pylint: disable=invalid-name
     return Dict(dict=p1_dict).store()
 
 
-@wf
+@workfunction
 def extract_core_electrons(cp2k_remote_folder):
     """Read from the cp2k.out the number of core electrons (included in the
     pseudopotential) and print them as a Dict

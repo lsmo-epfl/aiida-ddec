@@ -1,14 +1,13 @@
 {
   "name": "aiida-ddec",
-  "version": "1.0.0a1",
+  "version": "1.1.0a1",
   "license": "MIT License",
   "author": "Aliaksandr Yakutovich",
   "author_email": "aliaksandr.yakutovich@epfl.ch",
   "description": "AiiDA plugin DDEC code",
-  "url": "https:\/\/github.com\/yakutovicha\/aiida-ddec",
+  "url": "https://github.com/lsmo-epfl/aiida-ddec",
   "classifiers": [
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Framework :: AiiDA",
@@ -29,16 +28,11 @@
     "reentry"
   ],
   "data_files": [
-    [
-      ".",
-      [
-        "setup.json"
-      ]
-    ]
+    [".",["setup.json"]]
   ],
   "reentry_register": true,
   "install_requires": [
-    "aiida_core >= 1.0.0b6",
+    "aiida_core >= 1.0.0",
     "six"
   ],
   "extras_require": {
@@ -46,11 +40,10 @@
       "aiida-cp2k>=1.0.0b4"
     ],
     "pre-commit": [
-      "pre-commit==1.17.0",
+      "pre-commit==2.0.1",
       "yapf==0.28.0",
-      "prospector==1.1.7",
-      "pylint==1.9.4; python_version<'3.0'",
-      "pylint==2.3.1; python_version>='3.0'"
+      "prospector==1.2.0",
+      "pylint==2.4.4"
     ],
     "testing": [
       "pytest==4.4.1"
