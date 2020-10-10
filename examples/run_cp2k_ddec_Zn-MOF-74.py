@@ -1,17 +1,15 @@
-#!/usr/bin/env python  # pylint: disable=invalid-name
+# pylint: disable=invalid-name
 """ Test/example for the DdecCp2kChargesWorkChain"""
-from __future__ import absolute_import
-from __future__ import print_function
 import os
-import ase.io
 import click
+import ase.io
 
 from aiida.engine import run
 from aiida.orm import Code, Dict
 from aiida.plugins import DataFactory, WorkflowFactory
 
-Cp2kDdecWorkChain = WorkflowFactory('ddec.cp2k_ddec')
-StructureData = DataFactory('structure')
+Cp2kDdecWorkChain = WorkflowFactory('ddec.cp2k_ddec')  # pylint: disable=invalid-name
+StructureData = DataFactory('structure')  # pylint: disable=invalid-name
 
 
 @click.command('cli')

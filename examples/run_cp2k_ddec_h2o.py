@@ -1,8 +1,6 @@
-#!/usr/bin/env python
 """ Test/example for the DdecCp2kChargesWorkChain"""
-from __future__ import absolute_import
-from __future__ import print_function
 import click
+
 import ase.build
 
 from aiida.engine import run
