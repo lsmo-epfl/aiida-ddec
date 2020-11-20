@@ -3,7 +3,7 @@
 
 # modernizer: make sure our code-base is Python 3 ready
 - repo: https://github.com/python-modernize/python-modernize.git
-  sha: a234ce4e185cf77a55632888f1811d83b4ad9ef2
+  rev: a234ce4e185cf77a55632888f1811d83b4ad9ef2
   hooks:
   - id: python-modernize
     exclude: ^docs/
@@ -12,20 +12,24 @@
       - --nobackups
       - --nofix=dict_six
 
-- repo: local
+- repo: https://github.com/pre-commit/mirrors-yapf
+  rev: v0.30.0
   hooks:
   # yapf = yet another python formatter
   - id: yapf
     name: yapf
-    entry: yapf
-    language: system
     types: [python]
-    args: ["-i"]
+    exclude: >
+      (?x)^(
+          docs/.*|
+      )$
+    args: ['-i']
 
-  # prospector: collection of linters
-  - id: prospector
+- repo: local
+  hooks:
+    # pylint: static code analysis
+  - id: pylint
+    name: pylint
+    entry: pylint
+    types: [python]
     language: system
-    types: [file, python]
-    name: prospector
-    description: "This hook runs Prospector: https://github.com/landscapeio/prospector"
-    entry: prospector
