@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import
 import os
+import collections
 from aiida.engine import workfunction as wf
 from aiida.orm import Dict
 
@@ -17,7 +18,6 @@ def dict_merge(dct, merge_dct):
     :param merge_dct: dct merged into dct
     :return: None
     """
-    import collections
 
     for k, _ in merge_dct.items():
         if (k in dct and isinstance(dct[k], dict) and isinstance(merge_dct[k], collections.Mapping)):
