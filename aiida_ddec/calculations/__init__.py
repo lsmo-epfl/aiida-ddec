@@ -37,10 +37,7 @@ def input_render(input_dict):
             output += '\n'
         elif isinstance(value, bool):
             output += '<' + key + '>' + '\n'
-            if value == True:  # pylint: disable=singleton-comparison
-                output += '.true.'
-            elif value == False:  # pylint: disable=singleton-comparison
-                output += '.false.'
+            output += '.true.' if value else '.false'
             output += '\n'
             output += '</' + key + '>' + '\n'
             output += '\n'
