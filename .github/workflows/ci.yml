@@ -40,14 +40,12 @@ jobs:
         PYTEST_ADDOPTS: "--cov-report xml --cov-append"
       run: | 
         py.test
-        verdi run examples/run_cp2k_ddec_h2o.py cp2k@localhost ddec@localhost  ~/code/chargemol_09_26_2017/atomic_densities/
-        verdi run examples/run_cp2k_ddec_Zn-MOF-74.py cp2k@localhost ddec@localhost  ~/code/chargemol_09_26_2017/atomic_densities/
 
     - name: Upload coverage report
       if: github.repository == 'lsmo-epfl/aiida-ddec'
       uses: codecov/codecov-action@v1
       with:
-        name: aiida-lsmo
+        name: aiida-ddec
         file: ./coverage.xml
         fail_ci_if_error: true
 

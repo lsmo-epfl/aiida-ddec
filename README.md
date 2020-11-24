@@ -13,7 +13,15 @@ A [DDEC](https://sourceforge.net/projects/ddec/files/) plugin for AiiDA.
 pip install aiida-ddec
 ```
 
-### (development mode with code checking)
+## Usage
+
+Examples in the `examples` folder:
+
+-   `test_cp2k_ddec_h2o.py`: Run an ENERGY calculation, printing the
+    electron density cube file, and compute the DDEC charges from that
+
+
+### Run tests
 
 ```shell
 git clone https://github.com/lsmo-epfl/aiida-ddec
@@ -21,13 +29,6 @@ cd aiida-ddec
 pip install -e .['pre-commit','testing']
 pre-commit install
 ```
-
-## Usage
-
-Examples in the `examples` folder:
-
--   `cp2k_ddec.py`: workchain that run an ENERGY calculation in cp2k printing the
-    electron density cube file, and compute the DDEC charges from that
 
 ## License
 
