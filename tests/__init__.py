@@ -2,7 +2,7 @@
 """ Helper functions and classes for tests
 """
 from __future__ import absolute_import
-import os
+from pathlib import Path
 
-THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(THIS_DIR, 'data')
+THIS_DIR = Path(__file__).resolve().parent
+DATA_DIR = THIS_DIR / 'data'

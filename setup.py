@@ -7,6 +7,7 @@ from setuptools import setup, find_packages
 
 
 def run_setup():
+    """Set up aiida-ddec package"""
     with open('setup.json', 'r') as info:
         kwargs = json.load(info)
     setup(

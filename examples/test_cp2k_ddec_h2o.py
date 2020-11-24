@@ -4,8 +4,6 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
-import os
-import pytest
 import click
 import ase.build
 
@@ -19,16 +17,8 @@ Cp2kDdecWorkChain = WorkflowFactory('ddec.cp2k_ddec')  # pylint: disable=invalid
 StructureData = DataFactory('structure')  # pylint: disable=invalid-name
 
 
-@pytest.fixture(scope='function')
-def ddec_atdens_path():
-    """StructureData for Aluminum."""
-    return os.environ['ATDENS_PATH']
-
-
-def run_cp2k_ddec_h2o(cp2k_code, ddec_code, ddec_atdens_path):  # pylint: disable=redefined-outer-name
-    """Example usage:
-    ATDENS_PATH='/home/daniele/Programs/aiida-database/data/chargemol_09_26_2017/atomic_densities/'
-    verdi run test_cp2k_ddec_h2o.py cp2k-5.1@localhost ddec@localhost $ATDENS_PATH
+def run_cp2k_ddec_h2o(cp2k_code, ddec_code):  # pylint: disable=redefined-outer-name
+    """Run example for the DdecCp2kChargesWorkChain
     """
     print('Testing CP2K ENERGY calculation + DDEC on H2O...')
 
@@ -103,7 +93,6 @@ def run_cp2k_ddec_h2o(cp2k_code, ddec_code, ddec_atdens_path):  # pylint: disabl
             'charge type': 'DDEC6',
             'periodicity along A, B, and C vectors': [True, True, True],
             'compute BOs': False,
-            'atomic densities directory complete path': ddec_atdens_path,
             'input filename': 'valence_density',
         }
     )
@@ -119,11 +108,9 @@ def run_cp2k_ddec_h2o(cp2k_code, ddec_code, ddec_atdens_path):  # pylint: disabl
 @click.option('--ddec-code', type=cmdline.params.types.CodeParamType())
 @click.option('--cp2k-code', type=cmdline.params.types.CodeParamType())
 def cli(ddec_code, cp2k_code):
-    """Run example.
-
-    Example usage: $ ./test_cp2k_ddec_h2o.py --ddec-code my-ddec@myhost --cp2k-code my-cp2k@myhost
+    """Run example for the DdecCp2kChargesWorkChain
     """
-    run_cp2k_ddec_h2o(ddec_code=ddec_code, cp2k_code=cp2k_code, ddec_atdens_path=os.environ['ATDENS_PATH'])
+    run_cp2k_ddec_h2o(ddec_code=ddec_code, cp2k_code=cp2k_code)
 
 
 if __name__ == '__main__':
