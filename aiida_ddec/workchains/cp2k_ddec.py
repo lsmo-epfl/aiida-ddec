@@ -33,6 +33,9 @@ class Cp2kDdecWorkChain(WorkChain):
         spec.expose_outputs(Cp2kBaseWorkChain, include=['remote_folder'])
         spec.expose_outputs(DdecCalculation, include=['structure_ddec'])
 
+        spec.exit_code(903, 'ERROR_PARSING_CP2K_OUTPUT', 'Error while parsing CP2K output')
+        spec.exit_code(904, 'ERROR_PARSING_DDEC_OUTPUT', 'Error while parsing DDEC output')
+
     def run_cp2k(self):
         """Modify CP2K input to compute the charge density,
         and run the ENERGY calculation
@@ -69,9 +72,14 @@ class Cp2kDdecWorkChain(WorkChain):
         generate the DDEC input and submit DDEC calculation.
         """
         # extract number of core electrons from the cp2k output and prepare input
-        core_e = extract_core_electrons(self.ctx.cp2k_calc.outputs.remote_folder)
-        ddec_inputs = AttributeDict(self.exposed_inputs(DdecCalculation, 'ddec'))
-        ddec_inputs['charge_density_folder'] = self.ctx.cp2k_calc.outputs.remote_folder.creator.outputs.remote_folder
+        try:
+            core_e = extract_core_electrons(self.ctx.cp2k_calc.outputs.remote_folder)
+            ddec_inputs = AttributeDict(self.exposed_inputs(DdecCalculation, 'ddec'))
+            ddec_inputs['charge_density_folder'
+                       ] = self.ctx.cp2k_calc.outputs.remote_folder.creator.outputs.remote_folder
+        except Exception:  # pylint: disable=broad-except
+            return self.exit_codes.ERROR_PARSING_CP2K_OUTPUT  # pylint: disable=no-member
+
         ddec_inputs['parameters'] = merge_Dict(ddec_inputs['parameters'], core_e)
         ddec_inputs['metadata']['call_link_label'] = 'call_ddec_calc'
 
@@ -82,6 +90,11 @@ class Cp2kDdecWorkChain(WorkChain):
 
     def return_results(self):
         """Return exposed outputs and print the pk of the CifData w/DDEC"""
-        self.out_many(self.exposed_outputs(self.ctx.cp2k_calc, Cp2kBaseWorkChain))
-        self.out_many(self.exposed_outputs(self.ctx.ddec_calc, DdecCalculation))
-        self.report('DDEC charges computed: CifData<{}>'.format(self.outputs['structure_ddec'].pk))
+        try:
+            self.out_many(self.exposed_outputs(self.ctx.cp2k_calc, Cp2kBaseWorkChain))
+            self.out_many(self.exposed_outputs(self.ctx.ddec_calc, DdecCalculation))
+            self.report('DDEC charges computed: CifData<{}>'.format(self.outputs['structure_ddec'].pk))
+        except KeyError:
+            return self.exit_codes.ERROR_PARSING_DDEC_OUTPUT  # pylint: disable=no-member
+
+        return 0
