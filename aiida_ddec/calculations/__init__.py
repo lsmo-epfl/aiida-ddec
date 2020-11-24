@@ -4,11 +4,11 @@ from __future__ import absolute_import
 import os
 from collections import OrderedDict
 import six
+from voluptuous import Schema, Optional
+
 from aiida.engine import CalcJob
-from aiida.orm import Dict
-from aiida.orm import RemoteData
+from aiida.orm import Dict, RemoteData, CifData
 from aiida.common import CalcInfo, CodeInfo
-from aiida.orm.nodes.data.cif import CifData
 
 
 def input_render(input_dict):
@@ -37,7 +37,7 @@ def input_render(input_dict):
             output += '\n'
         elif isinstance(value, bool):
             output += '<' + key + '>' + '\n'
-            output += '.true.' if value else '.false'
+            output += '.true.' if value else '.false.'
             output += '\n'
             output += '</' + key + '>' + '\n'
             output += '\n'
@@ -47,6 +47,27 @@ def input_render(input_dict):
             output += '</' + key + '>' + '\n'
             output += '\n'
     return output
+
+
+DENSITY_DIR_KEY = 'atomic densities directory complete path'
+DENSITY_DIR_EXTRA = 'DDEC_ATOMIC_DENSITIES_DIRECTORY'
+PARAMETERS_SCHEMA = Schema(
+    {
+        'net charge': float,
+        'charge type': str,
+        'periodicity along A, B, and C vectors': [bool, bool, bool],
+        'compute BOs': bool,
+        Optional(DENSITY_DIR_KEY): str,
+        'input filename': str,
+        Optional('number of core electrons'): list,
+    },
+    required=True,
+)
+
+
+def validate_parameters(parameters, port):  # pylint: disable=unused-argument
+    """Validate input parameters according to voluptuous schema."""
+    PARAMETERS_SCHEMA(parameters.get_dict())
 
 
 class DdecCalculation(CalcJob):
@@ -69,6 +90,7 @@ class DdecCalculation(CalcJob):
         spec.input(
             'parameters',
             valid_type=Dict,
+            validator=validate_parameters,
             help='Input parameters such as net charge, protocol, atomic densities path, ...',
         )
         spec.input(
@@ -80,6 +102,7 @@ class DdecCalculation(CalcJob):
         spec.inputs['metadata']['options']['parser_name'].default = 'ddec'
         spec.inputs['metadata']['options']['resources'].default = {
             'num_machines': 1,
+            'num_mpiprocs_per_machine': 1,
         }
         spec.inputs['metadata']['options']['withmpi'].default = False
 
@@ -104,10 +127,26 @@ class DdecCalculation(CalcJob):
         :return: `aiida.common.datastructures.CalcInfo` instance
         """
 
+        # Determine atomic densities directory
+        pm_dict = self.inputs.parameters.get_dict()
+
+        if DENSITY_DIR_KEY not in pm_dict:
+            pm_dict[DENSITY_DIR_KEY] = self.inputs.code.extras.get(DENSITY_DIR_EXTRA)
+
+        if not pm_dict[DENSITY_DIR_KEY]:
+            raise ValueError(
+                f"Please provide '{DENSITY_DIR_KEY}' in the input parameters or set the "
+                f"{DENSITY_DIR_EXTRA} extra on the ddec code."
+            )
+
+        # The directory must end with a slash or chargemol crashes
+        if not pm_dict[DENSITY_DIR_KEY].endswith('/'):
+            pm_dict[DENSITY_DIR_KEY] += '/'
+
         # Write input to file
         input_filename = folder.get_abs_path(self._DEFAULT_INPUT_FILE)
         with open(input_filename, 'w') as infile:
-            infile.write(input_render(self.inputs.parameters.get_dict()))
+            infile.write(input_render(pm_dict))
 
         # Prepare CalcInfo to be returned to aiida
         calcinfo = CalcInfo()
@@ -120,7 +159,7 @@ class DdecCalculation(CalcJob):
             [self._DEFAULT_ADDITIONAL_RETRIEVE_LIST, '.', 0],
         ]
 
-        # Charge-density remotefolder (now working only for CP2K)
+        # Charge-density remote folder (now working only for CP2K)
         if 'charge_density_folder' in self.inputs:
             charge_density_folder = self.inputs.charge_density_folder
             comp_uuid = charge_density_folder.computer.uuid

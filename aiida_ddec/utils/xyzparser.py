@@ -67,10 +67,12 @@ def xyzparser(fname):
 
 
 def cell2abc(cell):
+    """Compute norms of cell vectors."""
     return norm(cell[0]), norm(cell[1]), norm(cell[2])
 
 
 def cell2angles(cell):
+    """Return angles alpha, beta, gamma between cell vectors."""
     alpha = degrees(acos(dot(cell[1], cell[2]) / norm(cell[1]) / norm(cell[2])))
     beta = degrees(acos(dot(cell[0], cell[2]) / norm(cell[0]) / norm(cell[2])))
     gamma = degrees(acos(dot(cell[0], cell[1]) / norm(cell[0]) / norm(cell[1])))
@@ -92,8 +94,7 @@ def xyz2cif(fname):
     fract_xyz = dot(xyz, inv(cell))
 
     # Create and return a CifFile object
-    ciffile = tempfile.NamedTemporaryFile(suffix='.cif')
-    with open(ciffile.name, 'w') as file:
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.cif') as file:
         file.write(CIF_HEADER.format(a=cell_a, b=cell_b, c=cell_c, alpha=alpha, beta=beta, gamma=gamma))
         for i, atm in enumerate(atoms):
             file.write(
@@ -101,4 +102,5 @@ def xyz2cif(fname):
                     atm=atm, x=fract_xyz[i][0], y=fract_xyz[i][1], z=fract_xyz[i][2], c=charges[i]
                 )
             )
-    return CifData(file=ciffile.name, scan_type='flex', parse_policy='lazy')
+        file.flush()
+        return CifData(file=file.name, scan_type='flex', parse_policy='lazy')

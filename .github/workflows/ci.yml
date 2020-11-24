@@ -31,15 +31,16 @@ jobs:
     - name: Install python dependencies
       run: |
         pip install --upgrade pip
-        pip install -e .[testing]
+        pip install -e .[testing,cp2k]
         reentry scan -r aiida
 
     - name: Run test suite
       env:
         AIIDA_TEST_BACKEND: ${{ matrix.backend }}
         PYTEST_ADDOPTS: "--cov-report xml --cov-append"
-      run: | 
-        py.test
+        # not used on CI but needs to coincide with the actual one to result in the same hash for the input file
+        DDEC_ATOMIC_DENSITIES_DIRECTORY: "/Users/leopold/Personal/Postdoc-MARVEL/repos/aiida/aiida-ddec/examples/data/ddec/atomic_densities/"
+      run: py.test
 
     - name: Upload coverage report
       if: github.repository == 'lsmo-epfl/aiida-ddec'
