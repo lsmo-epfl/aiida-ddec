@@ -40,9 +40,6 @@ mock_code:
   chargemol-09_26_2017: /path/to/Chargemol_09_02_2017_linux_serial
 ```
 
-Note: You may also need to change the value of `DDEC_ATOMIC_DENSITIES_DIRECTORY` environment variable in 
-`.github/workflows/ci.yml` in order for the CI tests to pass.
-
 ## License
 
 MIT

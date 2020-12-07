@@ -6,10 +6,10 @@ from __future__ import absolute_import
 import os
 import pytest
 
-from aiida_ddec.calculations import DENSITY_DIR_EXTRA
+from aiida_ddec.calculations import DENSITY_DIR_EXTRA, DENSITY_DIR_SYMLINK
+from examples import DATA_DIR as EXAMPLES_DATA_DIR
 
 from tests import DATA_DIR
-from examples import DATA_DIR as EXAMPLES_DATA_DIR
 
 pytest_plugins = ['aiida.manage.tests.pytest_fixtures', 'aiida_testing.mock_code']  # pylint: disable=invalid-name
 
@@ -27,7 +27,7 @@ def ddec_code(mock_code_factory):
         data_dir_abspath=DATA_DIR,
         entry_point='ddec',
         # files *not* to copy into the data directory
-        ignore_paths=('_aiidasubmit.sh', '*.cube')
+        ignore_paths=('_aiidasubmit.sh', '*.cube', DENSITY_DIR_SYMLINK)
     )
 
     # Set atomic density directory extra on code
@@ -47,5 +47,5 @@ def cp2k_code(mock_code_factory):
         data_dir_abspath=DATA_DIR,
         entry_point='cp2k',
         # files *not* to copy into the data directory
-        ignore_paths=('_aiidasubmit.sh', 'BASIS_MOLOPT', 'GTH_POTENTIALS', 'dftd3.dat', '*.bak*')
+        ignore_paths=('_aiidasubmit.sh', 'BASIS_MOLOPT', 'GTH_POTENTIALS', 'dftd3.dat', '*.bak*', '*.wfn')
     )
