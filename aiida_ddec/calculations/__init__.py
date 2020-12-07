@@ -51,6 +51,7 @@ def input_render(input_dict):
 
 DENSITY_DIR_KEY = 'atomic densities directory complete path'
 DENSITY_DIR_EXTRA = 'DDEC_ATOMIC_DENSITIES_DIRECTORY'
+DENSITY_DIR_SYMLINK = 'atomic_densities/'
 PARAMETERS_SCHEMA = Schema(
     {
         'net charge': float,
@@ -143,6 +144,13 @@ class DdecCalculation(CalcJob):
         if not pm_dict[DENSITY_DIR_KEY].endswith('/'):
             pm_dict[DENSITY_DIR_KEY] += '/'
 
+        if not os.path.isabs(pm_dict[DENSITY_DIR_KEY]):
+            raise ValueError(f"Path to atomic densities directory '{pm_dict[DENSITY_DIR_KEY]}' is not absolute.")
+
+        # Create symlink to atomic densities directory
+        density_dir_symlink = (self.inputs.code.computer.uuid, pm_dict[DENSITY_DIR_KEY], DENSITY_DIR_SYMLINK)
+        pm_dict[DENSITY_DIR_KEY] = DENSITY_DIR_SYMLINK
+
         # Write input to file
         input_filename = folder.get_abs_path(self._DEFAULT_INPUT_FILE)
         with open(input_filename, 'w') as infile:
@@ -153,7 +161,7 @@ class DdecCalculation(CalcJob):
         calcinfo.uuid = self.uuid
         calcinfo.local_copy_list = []
         calcinfo.remote_copy_list = []
-        calcinfo.remote_symlink_list = []
+        calcinfo.remote_symlink_list = [density_dir_symlink]
         calcinfo.retrieve_list = [
             self._DEFAULT_OUTPUT_FILE,
             [self._DEFAULT_ADDITIONAL_RETRIEVE_LIST, '.', 0],
