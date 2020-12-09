@@ -1,0 +1,286 @@
+  
+ ******************** TIME CONTROL ********************
+ Starting Chargemol version 3.5 September 26, 2017.
+ ******************************************************
+  
+ Starting DDEC program
+ 2020/12/07  15:40:13
+ Copyright (c) 2014, 2015, 2016 by Thomas A. Manz and Nidia Gabaldon Limas. Rights reserved.
+  
+ **************** THREAD INFORMATION ******************
+ Job running using serial mode.
+  
+ ******************************************************
+  
+ atomic_densities/                                                                                                                                                                                       
+  
+ ******************** TIME CONTROL ********************
+ Starting format_valence_cube_density
+ ******************************************************
+  
+ inputfile = "valence_density.cube"
+ parameters
+   3.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+   45.000000000000000       0.16797599999999999        0.0000000000000000        0.0000000000000000     
+   60.000000000000000        0.0000000000000000       0.17405899999999999        0.0000000000000000     
+   48.000000000000000        0.0000000000000000        0.0000000000000000       0.18095300000000000     
+ The maximum pixel electron correction was:    0.0000000000000000     
+ The number of pixel corrections was:            0
+ sum_negative_density
+   0.0000000000000000     
+  
+ ******************** TIME CONTROL ********************
+ Starting add_missing_core_density
+ ******************************************************
+  
+ center_nabc =
+          22          30          27
+          22          38          21
+          22          22          21
+ delta_na=     58
+ delta_nb=     56
+ delta_nc=     54
+  
+ ******************** TIME CONTROL ********************
+ Starting check_grid_spacing
+ ******************************************************
+  
+ The grid spacing in your electron density input file is adequate.
+  
+ ******************** TIME CONTROL ********************
+ Finished check_grid_spacing in   0.15500000119209290      seconds
+ ******************************************************
+  
+ Checking to see that all core electrons are accounted for:
+  
+ Printing atom number, atomic number, core electrons, and missing core for each atom.
+ (Missing core electrons will be inserted using stored core electron reference densities.)
+    1    8     2.000000    2
+    2    1     0.000000    0
+    3    1     0.000000    0
+ Finished the check for missing core electrons.
+  
+ ******************** TIME CONTROL ********************
+ Finished add_missing_core_density in   0.20399999618530273      seconds
+ ******************************************************
+  
+  
+ ******************** TIME CONTROL ********************
+ Finished format_valence_cube_density in   0.28299999237060547      seconds
+ ******************************************************
+  
+ ncore =        2.0000
+ nvalence =        8.0000
+ pixelvolume =    5.2907E-03
+ numerically integrated valence density =    8.0000E+00
+ sum_valence_occupancy_correction =    0.0000E+00
+ checkme =    5.6561E-06
+ The grid spacing is adequate and all electrons are properly accounted for.
+ Calculation will proceed.
+ Making sure the atomic coordinates for periodic directions are inside the reference unit cell.
+ The adjusted atomic coordinates are
+    3.7795    5.2218    4.9063
+    3.7795    6.6641    3.7795
+    3.7795    3.7795    3.7795
+  
+ The adjusted center_nabc is
+          22          30          27
+          22          38          21
+          22          22          21
+  
+ ******************** TIME CONTROL ********************
+ Starting core_iterator
+ ******************************************************
+  
+ Iteratively solving for the core charge distributions:
+ Iteration=   1
+ change=   4.614056E+00
+ Iteration=   2
+ change=   1.877791E-09
+ Iteration=   3
+ change=   0.000000E+00
+ Iteration=   4
+ change=   0.000000E+00
+ Iteration=   5
+ change=   0.000000E+00
+ Iteration=   6
+ change=   0.000000E+00
+ Correcting the core density grid
+ iteration=            1
+ iteration=            2
+ iteration=            3
+ iteration=            4
+ iteration=            5
+ iteration=            6
+ iteration=            7
+ Core density grid corrected in the following number of iterations: 
+ iter=            7
+  
+ ******************** TIME CONTROL ********************
+ Finished core_iterator in    2.4960000514984131      seconds
+ ******************************************************
+  
+  
+ ******************** TIME CONTROL ********************
+ Starting valence_iterator
+ ******************************************************
+  
+ Iteratively solving for the atomic partial charge distributions:
+ Normalization =  0.99999929298189549     
+ Information for noniterative Hirshfeld method will be printed now.
+  
+ ******************** TIME CONTROL ********************
+ Starting local_multipole_moment_analysis
+ ******************************************************
+  
+ Multipole analysis for each of the expansion sites.
+ XYZ coordinates, net charges, and multipoles are in atomic units. Dipoles and quadrupoles are for valence electrons.
+ center number, atomic number, x, y, z, net_charge, dipole_x, dipole_y, dipole_z, dipole_mag, Qxy, Qxz, Qyz, Q(x^2-y^2), Q(3z^2 - R^2),three eigenvalues of traceless quadrupole moment tensor
+     1     8  3.779452  5.221765  4.906313 -0.305608 -0.000066 -0.000024 -0.131310  0.131310  0.000005  0.000008 -0.000007 -0.421870 -0.063942 -0.200278 -0.021314  0.221592
+     2     1  3.779452  6.664078  3.779452  0.152797 -0.000006  0.176468 -0.127377  0.217637  0.000002  0.000002  0.026201 -0.075873 -0.034754 -0.032144 -0.022025  0.054170
+     3     1  3.779452  3.779452  3.779452  0.152810  0.000008 -0.176465 -0.127373  0.217632  0.000013  0.000005 -0.026199 -0.075864 -0.034785 -0.032135 -0.022032  0.054167
+  
+ ******************** TIME CONTROL ********************
+ Finished local_multipole_moment_analysis in   0.28099998831748962      seconds
+ ******************************************************
+  
+ Information for noniterative CM5 method will be printed now.
+ The computed CM5 net atomic charges are:
+    -0.633266     0.316626     0.316639
+ Hirshfeld and CM5 analysis finished, calculation of iterative AIM will proceed.
+ iter =            1
+ Localized charges for the current iteration: 
+     -0.643067      0.321533      0.321533
+ Net atomic charges for the current iteration: 
+     -0.305608      0.152797      0.152810
+ The updated reference ion charges will be: 
+     -0.530580      0.265288      0.265292
+ Normalization =  0.99999929298184997     
+ iter =            2
+ Localized charges for the current iteration: 
+     -0.964124      0.482061      0.482063
+ Net atomic charges for the current iteration: 
+     -0.643547      0.321768      0.321780
+ The updated reference ion charges will be: 
+     -0.857265      0.428630      0.428636
+  
+ ******************************************************
+ Finished first 2 partitioning steps in    1.4270000457763672      seconds
+ ******************************************************
+  
+ normalization=       0.999999
+  
+ ******************************************************
+ Finished conditioned number of reference ion electrons in   0.37700000405311584      seconds
+ ******************************************************
+  
+  
+ ******************************************************
+ Finished conditioned monotonic decay of reference density in    0.0000000000000000      seconds
+ ******************************************************
+  
+ iter = 3
+ Iterations to converge reshaping: 
+           1
+  
+ ******************************************************
+ Finished tau calculation in   0.36500000953674316      seconds
+ ******************************************************
+  
+ Conditioned reference density computation complete.
+  
+ ******************************************************
+ Finished 3rd partitioning step in   0.74299997091293335      seconds
+ This is the number of second to condition the reference densities plus the calculation of tau
+ ******************************************************
+  
+ iteration=            4
+ Normalization:   0.999999293
+ Net atomic charges for the current iteration: 
+     -0.824359      0.412176      0.412183
+ Max change:  1.808115E-01
+ Maximum density change:  6.510852E+01
+ Iterations to converge reshaping: 
+           1
+ iteration=            5
+ Normalization:   0.999999293
+ Net atomic charges for the current iteration: 
+     -0.805490      0.402741      0.402749
+ Max change:  1.886876E-02
+ Maximum density change:  6.838756E-03
+ Iterations to converge reshaping: 
+           2
+ iteration=            6
+ Normalization:   0.999999293
+ Net atomic charges for the current iteration: 
+     -0.790848      0.395420      0.395428
+ Max change:  1.464265E-02
+ Maximum density change:  2.695676E-03
+ Iterations to converge reshaping: 
+           2
+ iteration=            7
+ Normalization:   0.999999293
+ Net atomic charges for the current iteration: 
+     -0.778288      0.389140      0.389148
+ Max change:  1.255940E-02
+ Maximum density change:  1.315694E-03
+  
+ ******************************************************
+ Finished charge partitioning steps 4-7 in    1.6130000352859497      seconds
+ ******************************************************
+  
+  
+ ******************** TIME CONTROL ********************
+ Finished valence_iterator in    3.7829999923706055      seconds
+ ******************************************************
+  
+  
+ ******************** TIME CONTROL ********************
+ Starting local_multipole_moment_analysis
+ ******************************************************
+  
+ Multipole analysis for each of the expansion sites.
+ XYZ coordinates, net charges, and multipoles are in atomic units. Dipoles and quadrupoles are for valence electrons.
+ center number, atomic number, x, y, z, net_charge, dipole_x, dipole_y, dipole_z, dipole_mag, Qxy, Qxz, Qyz, Q(x^2-y^2), Q(3z^2 - R^2),three eigenvalues of traceless quadrupole moment tensor
+     1     8  3.779452  5.221765  4.906313 -0.778288 -0.000063 -0.000027  0.133555  0.133555  0.000002  0.000007 -0.000003 -0.288680 -0.041262 -0.137463 -0.013754  0.151217
+     2     1  3.779452  6.664078  3.779452  0.389140 -0.000004  0.033556 -0.002513  0.033650  0.000000  0.000001 -0.011036 -0.050749  0.017133 -0.028230  0.000243  0.027987
+     3     1  3.779452  3.779452  3.779452  0.389148  0.000004 -0.033557 -0.002509  0.033650  0.000009  0.000003  0.011037 -0.050746  0.017114 -0.028225  0.000238  0.027987
+  
+ ******************** TIME CONTROL ********************
+ Finished local_multipole_moment_analysis in   0.26199999451637268      seconds
+ ******************************************************
+  
+ Since the system is periodic, total multipole moment analysis will not be performed.
+ Calculation of the electron cloud penetration terms
+ Normal termination of Chargemol program.
+ Copyright (c) 2014, 2015, 2016, 2017 by Thomas A. Manz and Nidia Gabaldon Limas. Rights reserved.
+ Use and distribution of this program is subject to certain licensing restrictions.
+ Please see ddec.sourceforge.net for details.
+  
+ Please cite the following journal references when using this program to compute DDEC6 charges:
+ N. Gabaldon Limas and T. A. Manz,  "Introducing DDEC6 atomic population analysis: part 2. 
+ Computed results for a wide range of periodic and nonperiodic materials," RSC Advances, Vol. 6 (2016) 45727-45747.
+ T. A. Manz and N. Gabaldon Limas, "Introducing DDEC6 atomic population analysis: part 1.
+ Charge partitioning theory and methodology," RSC Advances, Vol. 6 (2016) 47771-47801.
+ If desired, you can also cite references listed below for the DDEC3 and earlier methods.
+  
+ Please cite the following journal references when using this program to compute DDEC, Hirshfeld, or ISA charges:
+ Thomas A. Manz and David S. Sholl, "Improved Atoms-in-Molecule Charge Partitioning Functional for Simultaneously Reproducing the Electrostatic
+ Potential and Chemical States in Periodic and Non-Periodic Materials", J. Chem. Theory Comput., Vol. 8 (2012) 2844-2867.
+ Thomas A. Manz and David S. Sholl, "Chemically Meaningful Atomic Charges that Reproduce the Electrostatic Potential in Periodic and Nonperiodic
+ Materials", J. Chem. Theory Comput., Vol. 6 (2010) 2455-2468.
+  
+ Please cite the following journal reference when using this program to compute atomic spin moments:
+ Thomas A. Manz and David S. Sholl, "Methods for Computing Accurate Atomic Spin Moments for Collinear and Noncollinear Magnetism in Periodic and
+ Nonperiodic Materials", J. Chem. Theory Comput., Vol. 7 (2011) 4146-4164.
+  
+ Please cite the following reference when using this program to compute bond orders:
+ Thomas A. Manz, "Introducing DDEC6 atomic population analysis: part 3. Comprehensive method to compute bond orders.", RSC Advances, Vol. 7 (2017) 45552-45581.
+  
+ Exiting Chargemol
+ 2020/12/07  15:40:20
+  
+ ******************** TIME CONTROL ********************
+ Finished chargemol in    6.8270001411437988      seconds
+ ******************************************************
+  
