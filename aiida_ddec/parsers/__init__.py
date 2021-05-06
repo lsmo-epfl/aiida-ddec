@@ -37,7 +37,7 @@ class DdecParser(Parser):
             raise self.exit_codes.ERROR_NO_OUTPUT_FILE
 
         finished = False
-        with open(os.path.join(out_folder._repository._get_base_folder().abspath, output_file)) as file:  # pylint: disable=protected-access
+        with out_folder.open(output_file) as file:
             for line in file.readlines():
                 if 'Finished chargemol in' in line:
                     finished = True
@@ -46,11 +46,8 @@ class DdecParser(Parser):
             raise OutputParsingError('Calculation did not finish correctly')
 
         # Create CifData object from the following the file path returned by xyz2cif
-        output_cif = xyz2cif(
-            os.path.join(
-                out_folder._repository._get_base_folder().abspath, 'DDEC6_even_tempered_net_atomic_charges.xyz'
-            )
-        )
+        with out_folder.open('DDEC6_even_tempered_net_atomic_charges.xyz') as handle:
+            output_cif = xyz2cif(handle.readlines())
         self.out('structure_ddec', output_cif)
 
         return ExitCode(0)

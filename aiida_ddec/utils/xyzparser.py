@@ -41,10 +41,11 @@ _atom_site_charge
 """
 
 
-def xyzparser(fname):
-    """Extract from XYZ files cell, atoms, coordinates, charges."""
-    with open(fname, 'r') as file:
-        lines = file.readlines()
+def xyzparser(lines):
+    """Extract from XYZ files cell, atoms, coordinates, charges.
+
+    :param lines: List of lines of XYZ file, e.g. result of open(filename).readlines()
+    """
 
     # Number of atoms
     natoms = int(lines[0])
@@ -79,12 +80,14 @@ def cell2angles(cell):
     return alpha, beta, gamma
 
 
-def xyz2cif(fname):
+def xyz2cif(lines):
     """
     Convert xyz file produced by DDEC program to a cif file.
+
+    :param lines: List of lines of XYZ file, e.g. result of open(filename).readlines()
     """
     # Extract important data from the xyz file
-    cell, atoms, xyz, charges = xyzparser(fname)
+    cell, atoms, xyz, charges = xyzparser(lines)
 
     # Transform cell into a,b,c and alpha, beta, gamma
     cell_a, cell_b, cell_c = cell2abc(cell)
