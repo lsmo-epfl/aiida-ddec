@@ -94,7 +94,7 @@ jobs:
     - name: Install python dependencies
       run: |
         pip install --upgrade pip
-        pip install -e .[pre-commit,testing]
+        pip install -e .[pre-commit,testing,cp2k]
         reentry scan -r aiida
     - name: Run pre-commit
       run: |
