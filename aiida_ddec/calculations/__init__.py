@@ -175,8 +175,16 @@ class DdecCalculation(CalcJob):
                 charge_density_folder.get_remote_path(),
                 'aiida-ELECTRON_DENSITY-1_0.cube',
             )
-            symlink = (comp_uuid, remote_path, 'valence_density.cube')
-            calcinfo.remote_symlink_list.append(symlink)
+            copy_info = (comp_uuid, remote_path, 'valence_density.cube')
+            if self.inputs.code.computer.uuid == comp_uuid:  # if running on the same computer - make a symlink
+                calcinfo.remote_symlink_list.append(copy_info)
+            else:  # if not - copy the folder
+                self.report(
+                    f"Warning: Transferring cube file {charge_density_folder.get_remote_path()} from " +
+                    f"computer {charge_density_folder.computer.label} to computer {self.inputs.code.computer.label}. " +
+                    "This may put strain on your network."
+                )
+                calcinfo.remote_copy_list.append(copy_info)
 
         codeinfo = CodeInfo()
         codeinfo.cmdline_params = []
