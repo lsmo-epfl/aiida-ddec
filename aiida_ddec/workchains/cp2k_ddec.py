@@ -77,7 +77,8 @@ class Cp2kDdecWorkChain(WorkChain):
             ddec_inputs = AttributeDict(self.exposed_inputs(DdecCalculation, 'ddec'))
             ddec_inputs['charge_density_folder'
                        ] = self.ctx.cp2k_calc.outputs.remote_folder.creator.outputs.remote_folder
-        except Exception:  # pylint: disable=broad-except
+        except Exception as exc:  # pylint: disable=broad-except
+            self.report(f'Encountered exception "{str(exc)}" while parsing CP2K output')
             return self.exit_codes.ERROR_PARSING_CP2K_OUTPUT  # pylint: disable=no-member
 
         ddec_inputs['parameters'] = merge_Dict(ddec_inputs['parameters'], core_e)

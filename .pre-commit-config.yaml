@@ -2,6 +2,7 @@
 # pre-commit install
 
 # modernizer: make sure our code-base is Python 3 ready
+repos:
 - repo: https://github.com/python-modernize/python-modernize.git
   rev: a234ce4e185cf77a55632888f1811d83b4ad9ef2
   hooks:

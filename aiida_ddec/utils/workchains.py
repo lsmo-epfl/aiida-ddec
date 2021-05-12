@@ -2,7 +2,6 @@
 """utils for the workchains"""
 
 from __future__ import absolute_import
-import os
 import collections
 from aiida.engine import workfunction as wf
 from aiida.orm import Dict
@@ -42,10 +41,8 @@ def extract_core_electrons(cp2k_remote_folder):
     """Read from the cp2k.out the number of core electrons (included in the
     pseudopotential) and print them as a Dict
     """
-    cp2k_out_dir = cp2k_remote_folder.creator.outputs.retrieved._repository._get_base_folder().abspath  # pylint: disable=protected-access
-    cp2k_out_file = os.path.join(cp2k_out_dir, 'aiida.out')
-    with open(cp2k_out_file) as f:  # pylint: disable=invalid-name
-        content = f.readlines()
+    with cp2k_remote_folder.creator.outputs.retrieved.open('aiida.out') as handle:
+        content = handle.readlines()
     for n_line, line in enumerate(content):
         if '- Atoms:' in line:
             n_atoms = int(line.split()[2])
