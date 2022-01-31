@@ -44,12 +44,19 @@ def extract_core_electrons(cp2k_remote_folder):
     with cp2k_remote_folder.creator.outputs.retrieved.open('aiida.out') as handle:
         content = handle.readlines()
     for n_line, line in enumerate(content):
+        if line.startswith(' CP2K| version string:'):
+            cp2k_version = float(line.split()[5])
         if '- Atoms:' in line:
             n_atoms = int(line.split()[2])
         if 'Atom  Kind  Element       X           Y           Z' in line:
             break
-    res = {
-        e.split()[3]: round(float(e.split()[7])) for e in content[n_line + 2:n_line + n_atoms + 2]  # pylint: disable=undefined-loop-variable
-    }
+    if cp2k_version == float(9.0):
+        res = {
+            e.split()[3]: round(float(e.split()[7])) for e in content[n_line + 1:n_line + n_atoms + 1]  # pylint: disable=undefined-loop-variable
+        }
+    else:
+        res = {
+            e.split()[3]: round(float(e.split()[7])) for e in content[n_line + 2:n_line + n_atoms + 2]  # pylint: disable=undefined-loop-variable
+        }
     res = [k + ' ' + str(int(k) - int(v)) for k, v in res.items()]
     return Dict(dict={'number of core electrons': res}).store()
