@@ -3,22 +3,21 @@ name: ci
 on: [push, pull_request]
 
 jobs:
-
   tests:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       matrix:
         python-version: [3.8]
-        backend: ['django']
-        aiida-version: ['stable', 'develop']
+        backend: ["django"]
+        aiida-version: ["stable", "develop"]
 
     services:
       postgres:
         image: postgres:12
         env:
           POSTGRES_DB: test
-          POSTGRES_PASSWORD: ''
+          POSTGRES_PASSWORD: ""
           POSTGRES_HOST_AUTH_METHOD: trust
         options: >-
           --health-cmd pg_isready
@@ -32,71 +31,70 @@ jobs:
         ports:
           - 5672:5672
 
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install aiida develop version
-      run: |
-        pip install git+git://github.com/aiidateam/aiida-core
-      if: ${{ matrix.aiida-version == 'develop' }}
+      - name: Install aiida develop version
+        run: |
+          pip install git+https://github.com/aiidateam/aiida-core.git
+        if: ${{ matrix.aiida-version == 'develop' }}
 
-    - name: Install python dependencies
-      run: |
-        pip install --upgrade pip
-        pip install -e .[testing,cp2k]
-        reentry scan -r aiida
+      - name: Install python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -e .[testing,cp2k]
+          reentry scan -r aiida
 
-    - name: Run test suite
-      env:
-        AIIDA_TEST_BACKEND: ${{ matrix.backend }}
-        PYTEST_ADDOPTS: "--cov-report xml --cov-append"
-      run: py.test
+      - name: Run test suite
+        env:
+          AIIDA_TEST_BACKEND: ${{ matrix.backend }}
+          PYTEST_ADDOPTS: "--cov-report xml --cov-append"
+        run: py.test
 
-    - name: Upload coverage report
-      if: github.repository == 'lsmo-epfl/aiida-ddec'
-      uses: codecov/codecov-action@v1
-      with:
-        name: aiida-ddec
-        file: ./coverage.xml
-        fail_ci_if_error: true
+      - name: Upload coverage report
+        if: github.repository == 'lsmo-epfl/aiida-ddec'
+        uses: codecov/codecov-action@v1
+        with:
+          name: aiida-ddec
+          file: ./coverage.xml
+          fail_ci_if_error: true
 
-#  docs:
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 15
-#    steps:
-#    - uses: actions/checkout@v1
-#    - name: Set up Python 3.8
-#      uses: actions/setup-python@v1
-#      with:
-#        python-version: 3.8
-#    - name: Install python dependencies
-#      run: |
-#        pip install --upgrade pip
-#        pip install -e .[docs]
-#        reentry scan -r aiida
-#    - name: Build docs
-#      run: cd docs && make
+  #  docs:
+  #    runs-on: ubuntu-latest
+  #    timeout-minutes: 15
+  #    steps:
+  #    - uses: actions/checkout@v1
+  #    - name: Set up Python 3.8
+  #      uses: actions/setup-python@v1
+  #      with:
+  #        python-version: 3.8
+  #    - name: Install python dependencies
+  #      run: |
+  #        pip install --upgrade pip
+  #        pip install -e .[docs]
+  #        reentry scan -r aiida
+  #    - name: Build docs
+  #      run: cd docs && make
 
   pre-commit:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.8
-    - name: Install python dependencies
-      run: |
-        pip install --upgrade pip
-        pip install -e .[pre-commit,testing,cp2k]
-        reentry scan -r aiida
-    - name: Run pre-commit
-      run: |
-        pre-commit install
-        pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -e .[pre-commit,testing,cp2k]
+          reentry scan -r aiida
+      - name: Run pre-commit
+        run: |
+          pre-commit install
+          pre-commit run --all-files || ( git status --short ; git diff ; exit 1 )
