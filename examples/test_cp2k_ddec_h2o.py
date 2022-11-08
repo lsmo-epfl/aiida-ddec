@@ -11,7 +11,11 @@ from aiida.plugins import DataFactory, WorkflowFactory
 from aiida import cmdline
 from aiida import engine
 from aiida.orm import Dict, StructureData, SinglefileData
-from . import DATA_DIR
+from pathlib import Path
+#from . import DATA_DIR
+
+THIS_DIR = Path(__file__).resolve().parent
+DATA_DIR = THIS_DIR / 'data'
 
 Cp2kDdecWorkChain = WorkflowFactory('ddec.cp2k_ddec')  # pylint: disable=invalid-name
 StructureData = DataFactory('structure')  # pylint: disable=invalid-name
@@ -33,7 +37,7 @@ def run_cp2k_ddec_h2o(cp2k_code, ddec_code):  # pylint: disable=redefined-outer-
         'num_machines': 1,
         'num_mpiprocs_per_machine': 1,
     }
-    builder.cp2k_base.cp2k.metadata.options.withmpi = False
+    builder.cp2k_base.cp2k.metadata.options.withmpi = False     # comment for production
     builder.cp2k_base.cp2k.metadata.options.max_wallclock_seconds = 10 * 60
     builder.cp2k_base.cp2k.parameters = Dict(
         dict={
