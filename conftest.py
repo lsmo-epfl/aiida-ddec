@@ -11,8 +11,6 @@ from examples import DATA_DIR as EXAMPLES_DATA_DIR
 
 from tests import DATA_DIR
 
-pytest_plugins = ['aiida.manage.tests.pytest_fixtures', 'aiida_testing.mock_code']  # pylint: disable=invalid-name
-
 
 @pytest.fixture(scope='function', autouse=True)
 def clear_database_auto(clear_database):  # pylint: disable=unused-argument
