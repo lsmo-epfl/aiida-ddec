@@ -27,7 +27,7 @@ dependencies = [
 ]
 
 [project.license]
-text = "MIT License"
+file = "LICENSE"
 
 [project.readme]
 file = "README.md"
