@@ -60,11 +60,6 @@ testing = [
     "pytest~=6.0",
 ]
 
-[tool.setuptools]
-include-package-data = true
-
-[tool.setuptools.packages.find]
-namespaces = false
 
 [tool.pylint.format]
 max-line-length = 120
