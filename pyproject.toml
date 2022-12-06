@@ -7,7 +7,7 @@ name = "aiida_ddec"
 
 [project]
 name = "aiida-ddec"
-version = "1.1.0"
+dynamic = ["version"]
 authors = [
     { name = "Aliaksandr Yakutovich", email = "aliaksandr.yakutovich@epfl.ch" },
 ]
