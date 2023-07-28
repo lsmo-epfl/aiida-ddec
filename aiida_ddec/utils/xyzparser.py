@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 """Convert XYZ to CIF keeping the charges"""
 from __future__ import absolute_import
+
 import re
 import tempfile
-from math import degrees, acos
+from math import acos, degrees
+
+from aiida.plugins import DataFactory
 from numpy import dot
 from numpy.linalg import inv, norm
 from six.moves import map
 
-from aiida.plugins import DataFactory
-
-CifData = DataFactory('cif')  # pylint: disable=invalid-name
+CifData = DataFactory("core.cif")  # pylint: disable=invalid-name
 
 CIF_HEADER = """data_crystal
 
@@ -52,17 +53,17 @@ def xyzparser(lines):
 
     # Cell
     cell_string = lines[1]
-    cell_unformatted = re.search(r'\[.*?\]', cell_string).group(0)[1:-1].split(',')
-    cell = [list(map(float, re.search(r'\{.*?\}', e).group(0)[1:-1].split())) for e in cell_unformatted]
+    cell_unformatted = re.search(r"\[.*?\]", cell_string).group(0)[1:-1].split(",")
+    cell = [list(map(float, re.search(r"\{.*?\}", e).group(0)[1:-1].split())) for e in cell_unformatted]
 
     # Atoms
-    atoms = [i.split()[0] for i in lines[2:natoms + 2]]
+    atoms = [i.split()[0] for i in lines[2 : natoms + 2]]
 
     # XYZ coordinates
-    xyz = [list(map(float, i.split()[1:4])) for i in lines[2:natoms + 2]]
+    xyz = [list(map(float, i.split()[1:4])) for i in lines[2 : natoms + 2]]
 
     # Charges
-    charges = [float(i.split()[4]) for i in lines[2:natoms + 2]]
+    charges = [float(i.split()[4]) for i in lines[2 : natoms + 2]]
 
     return cell, atoms, xyz, charges
 
@@ -97,13 +98,17 @@ def xyz2cif(lines):
     fract_xyz = dot(xyz, inv(cell))
 
     # Create and return a CifFile object
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.cif') as file:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".cif") as file:
         file.write(CIF_HEADER.format(a=cell_a, b=cell_b, c=cell_c, alpha=alpha, beta=beta, gamma=gamma))
         for i, atm in enumerate(atoms):
             file.write(
-                '{atm:10} {atm:5} {x:>9.5f} {y:>9.5f} {z:>9.5f} {c:>9.5f}\n'.format(
-                    atm=atm, x=fract_xyz[i][0], y=fract_xyz[i][1], z=fract_xyz[i][2], c=charges[i]
+                "{atm:10} {atm:5} {x:>9.5f} {y:>9.5f} {z:>9.5f} {c:>9.5f}\n".format(
+                    atm=atm,
+                    x=fract_xyz[i][0],
+                    y=fract_xyz[i][1],
+                    z=fract_xyz[i][2],
+                    c=charges[i],
                 )
             )
         file.flush()
-        return CifData(file=file.name, scan_type='flex', parse_policy='lazy')
+        return CifData(file=file.name, scan_type="flex", parse_policy="lazy")
