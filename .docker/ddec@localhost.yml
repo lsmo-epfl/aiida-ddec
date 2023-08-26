@@ -1,0 +1,8 @@
+label: ddec
+computer: localhost
+description: DDEC code
+default_calc_job_plugin: ddec
+filepath_executable: /opt/code/chargemol_09_26_2017/chargemol_FORTRAN_09_26_2017/compiled_binaries/linux/Chargemol_09_26_2017_linux_parallel
+use_double_quotes: False
+append_text:
+prepend_text:
